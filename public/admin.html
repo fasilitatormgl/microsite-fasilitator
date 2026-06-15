@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Dashboard Microsite Fasilitator</title>
+
+<link rel="icon" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="style.css">
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+
+<body class="p-4 md:p-6 max-w-6xl mx-auto">
+
+<!-- LOADING -->
+<div id="loadingScreen">
+  <div class="loader"></div>
+  <p class="mt-4 text-cyan-300">Memuat Dashboard...</p>
+</div>
+
+<!-- HEADER -->
+<div class="mb-6 fade">
+  <h1 class="text-3xl font-bold neon">
+    🚀 Dashboard Microsite
+  </h1>
+  <p class="opacity-70">
+    Kelola microsite fasilitator dengan mudah
+  </p>
+</div>
+
+<!-- GRID -->
+<div class="grid lg:grid-cols-3 gap-6">
+
+  <!-- FORM -->
+  <div class="lg:col-span-1 glass p-5 rounded-2xl fade">
+
+    <h2 class="text-xl font-bold mb-4 neon">
+      ➕ Buat Microsite
+    </h2>
+
+    <!-- INFO -->
+    <div class="mb-5">
+      <h3 class="text-sm opacity-70 mb-2">
+        Informasi Microsite
+      </h3>
+
+      <input
+        id="slug"
+        placeholder="slug-contoh-tidak-ada-spasi"
+        class="w-full p-3 text-black rounded-lg mb-3"
+      >
+
+      <input
+        id="title"
+        placeholder="Judul Microsite"
+        class="w-full p-3 text-black rounded-lg mb-3"
+      >
+
+      <input
+        id="desc"
+        placeholder="Deskripsi"
+        class="w-full p-3 text-black rounded-lg mb-3"
+      >
+
+      <!-- KATEGORI MICROSITE -->
+      <select
+        id="micrositeCategory"
+        class="w-full p-3 text-black rounded-lg"
+      >
+        <option value="OPD">🏘️ OPD</option>
+        <option value="Kecamatan">🏢 Kecamatan</option>
+        <option value="Dokumen">📄 Dokumen</option>
+        <option value="FASILITATOR">🔒 FASILITATOR</option>
+        <option value="Publik">🌐 Publik</option>
+        <option value="Lainnya">📁 Lainnya</option>
+      </select>
+    </div>
+
+    <!-- DAFTAR LINK -->
+    <div class="mb-5">
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="text-sm opacity-70">
+          Daftar Link
+        </h3>
+
+        <button
+          onclick="addLink()"
+          class="bg-green-500 px-3 py-1 rounded-lg text-black font-semibold"
+        >
+          + Tambah
+        </button>
+      </div>
+
+      <div id="links" class="space-y-2"></div>
+    </div>
+
+    <!-- SAVE -->
+    <button
+      onclick="save()"
+      class="w-full bg-cyan-500 text-black font-bold py-3 rounded-xl"
+    >
+      💾 Simpan Microsite
+    </button>
+
+  </div>
+
+  <!-- DATA -->
+  <div class="lg:col-span-2 fade">
+
+    <div class="glass p-5 rounded-2xl mb-4">
+      <h2 class="text-xl font-bold neon">
+        📊 Data Microsite
+      </h2>
+      <p class="opacity-70 text-sm">
+        Semua microsite yang sudah dibuat
+      </p>
+    </div>
+
+    <div id="list" class="grid md:grid-cols-2 gap-4"></div>
+
+  </div>
+
+</div>
+
+<!-- MODAL LINK -->
+<div
+  id="modalLink"
+  class="hidden fixed inset-0 bg-black/70 flex items-center justify-center p-4"
+>
+  <div class="glass p-6 rounded-2xl w-full max-w-sm fade">
+
+    <h2 class="text-lg mb-4 neon">
+      🔗 Tambah Link
+    </h2>
+
+    <input
+      id="linkName"
+      placeholder="Nama Link"
+      class="w-full p-3 text-black rounded-lg mb-3"
+    >
+
+    <input
+      id="linkUrl"
+      placeholder="https://..."
+      class="w-full p-3 text-black rounded-lg mb-3"
+    >
+
+    <!-- KATEGORI LINK -->
+    <select
+      id="linkCategory"
+      class="w-full p-3 text-black rounded-lg mb-4"
+    >
+      <option value="Dokumen">📄 Dokumen</option>
+      <option value="Website">🌐 Website</option>
+      <option value="Spreadsheet">📊 Spreadsheet</option>
+      <option value="Drive">📂 Drive</option>
+      <option value="Lainnya">🔗 Lainnya</option>
+    </select>
+
+    <div class="flex gap-2 justify-end">
+
+      <button
+        onclick="closeModal()"
+        class="bg-gray-500 px-4 py-2 rounded-lg"
+      >
+        Batal
+      </button>
+
+      <button
+        onclick="saveLink()"
+        class="bg-cyan-500 text-black px-4 py-2 rounded-lg"
+      >
+        Simpan
+      </button>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL QR -->
+<div
+  id="qrModal"
+  class="hidden fixed inset-0 bg-black/70 flex items-center justify-center p-4"
+>
+  <div class="glass p-6 rounded-2xl text-center fade">
+
+    <h2 class="mb-4 neon text-lg">
+      📱 QR Code
+    </h2>
+
+    <div id="qrcode" class="mb-4 flex justify-center"></div>
+
+    <div class="flex gap-2 justify-center">
+
+      <button
+        onclick="downloadQR()"
+        class="bg-green-500 text-black px-4 py-2 rounded-lg"
+      >
+        ⬇️ Download
+      </button>
+
+      <button
+        onclick="closeQR()"
+        class="bg-gray-500 px-4 py-2 rounded-lg"
+      >
+        Tutup
+      </button>
+
+    </div>
+  </div>
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>

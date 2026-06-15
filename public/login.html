@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Login - Microsite Fasilitator</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+<style>
+body {
+  margin: 0;
+  font-family: sans-serif;
+  color: white;
+
+  background:
+    linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
+    url('/backgroundmgl.webp');
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  min-height: 100vh;
+}
+
+/* MOBILE FIX */
+@media (max-width: 768px) {
+  body {
+    background-attachment: scroll;
+    background-position: center top;
+  }
+}
+
+/* DESKTOP EFFECT */
+@media (min-width: 769px) {
+  body {
+    background-attachment: fixed;
+  }
+}
+.glass {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(20px);
+}
+</style>
+</head>
+
+<body class="flex items-center justify-center h-screen text-white">
+
+<div class="glass p-8 rounded-2xl w-80 text-center">
+  <h1 class="text-xl mb-4">🚀 Microsite Fasilitator</h1>
+
+  <input id="email" placeholder="Email" class="w-full p-2 mb-2 text-black rounded">
+
+  <div class="flex">
+    <input id="password" type="password" class="w-full p-2 text-black rounded-l">
+    <button onclick="toggle()" class="bg-gray-700 px-3">👁️</button>
+  </div>
+
+  <button onclick="login()" class="w-full mt-4 bg-blue-500 p-2 rounded">
+    Login
+  </button>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDSnHojwSRgk71MPpOuvFlgwiGnv8GPuc4",
+  authDomain: "gofasilitator.firebaseapp.com",
+};
+
+firebase.initializeApp(firebaseConfig);
+
+function toggle(){
+  password.type = password.type === "password" ? "text" : "password";
+}
+
+function login(){
+  firebase.auth().signInWithEmailAndPassword(email.value,password.value)
+  .then(()=> location.href="admin.html")
+  .catch(e=> alert(e.message));
+}
+</script>
+
+</body>
+</html>

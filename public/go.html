@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDSnHojwSRgk71MPpOuvFlgwiGnv8GPuc4",
+  authDomain: "gofasilitator.firebaseapp.com",
+  projectId: "gofasilitator",
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+const code = window.location.pathname.split("/")[2];
+
+db.collection("shortlinks").doc(code).get().then(doc=>{
+  if(doc.exists){
+    window.location = doc.data().url;
+  } else {
+    document.body.innerHTML="Link tidak ditemukan";
+  }
+});
+</script>
+
+</body>
+</html>

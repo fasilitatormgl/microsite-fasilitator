@@ -1,0 +1,37 @@
+{
+  "hosting": { 
+    "public": "public", 
+    "rewrites": [ 
+      { "source": "/go/**", "destination": "/go.html" }, 
+      { "source": "**", "destination": "/index.html" } 
+    ] 
+  } 
+}
+
+aseliiiii================
+
+
+
+
+{
+  "hosting": {
+    "public": "dist",
+    "rewrites": [
+      {
+        "source": "/admin/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/:slug",
+        "function": "micrositeHandler"
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "functions": {
+    "source": "functions"
+  }
+}

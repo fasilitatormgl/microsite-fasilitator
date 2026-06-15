@@ -1,0 +1,109 @@
+body{
+  margin:0;
+  font-family:sans-serif;
+  color:white;
+  min-height:100vh;
+  background:
+    linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.45)),
+    url('/backgroundmgl.webp');
+  background-size:cover;
+  background-position:center;
+  background-attachment:fixed;
+}
+
+@media(max-width:768px){
+  body{
+    background-attachment:scroll;
+  }
+}
+
+.glass{
+  background:rgba(255,255,255,.08);
+  backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 8px 30px rgba(0,0,0,.2);
+}
+
+.neon{
+  color:cyan;
+  text-shadow:
+    0 0 5px cyan,
+    0 0 15px cyan;
+}
+
+input,
+select{
+  transition:.25s;
+  outline:none;
+}
+
+input:focus,
+select:focus{
+  transform:scale(1.01);
+  box-shadow:0 0 0 2px cyan;
+}
+
+button{
+  transition:.2s;
+}
+
+button:hover{
+  transform:translateY(-2px);
+}
+
+button:active{
+  transform:scale(.95);
+}
+
+.fade{
+  animation:fade .4s ease;
+}
+
+@keyframes fade{
+  from{
+    opacity:0;
+    transform:translateY(10px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+::-webkit-scrollbar{
+  width:8px;
+}
+
+::-webkit-scrollbar-thumb{
+  background:rgba(255,255,255,.2);
+  border-radius:20px;
+}
+
+#loadingScreen{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.9);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  z-index:99999;
+}
+
+.loader{
+  width:55px;
+  height:55px;
+  border:5px solid rgba(255,255,255,.1);
+  border-top:5px solid cyan;
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+  from{
+    transform:rotate(0);
+  }
+  to{
+    transform:rotate(360deg);
+  }
+}
