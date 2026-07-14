@@ -1,1138 +1,223 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Microsite Fasilitator</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Favicon -->
-  <link rel="icon" href="/favicon.png">
-  <link rel="apple-touch-icon" href="/favicon.png">
+<title>Dashboard Microsite Fasilitator</title>
 
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com">
-  </script>
+<link rel="icon" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
 
-  <!-- Custom Style -->
-  <style>
-    /* ========== GLOBAL ========== */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      background: #f8fafc;
-      color: #1e293b;
-      line-height: 1.6;
-      min-height: 100vh;
-    }
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="style.css">
 
-    /* ========== LOADING SCREEN ========== */
-    .loading-screen {
-      position: fixed;
-      inset: 0;
-      background: #ffffff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      transition: opacity 0.4s ease, visibility 0.4s ease;
-    }
-    .loading-screen.hidden {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-    }
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid #e2e8f0;
-      border-top-color: #0ea5e9;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-    }
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    /* ========== CARDS ========== */
-    .card {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 16px;
-      padding: 1.5rem;
-      transition: box-shadow 0.2s ease, transform 0.15s ease;
-    }
-    .card:hover {
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-      transform: translateY(-1px);
-    }
-
-    /* ========== FORM ELEMENTS ========== */
-    .input-field {
-      width: 100%;
-      padding: 0.7rem 1rem;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      font-size: 0.95rem;
-      background: #f8fafc;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-      outline: none;
-      color: #1e293b;
-    }
-    .input-field:focus {
-      border-color: #0ea5e9;
-      box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
-      background: #ffffff;
-    }
-    .input-field::placeholder {
-      color: #94a3b8;
-    }
-
-    .select-field {
-      width: 100%;
-      padding: 0.7rem 1rem;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      font-size: 0.95rem;
-      background: #f8fafc;
-      outline: none;
-      cursor: pointer;
-      color: #1e293b;
-      transition: border-color 0.2s ease;
-    }
-    .select-field:focus {
-      border-color: #0ea5e9;
-      box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.4rem;
-      padding: 0.65rem 1.4rem;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border: none;
-      white-space: nowrap;
-    }
-    .btn-primary {
-      background: #0ea5e9;
-      color: #fff;
-    }
-    .btn-primary:hover {
-      background: #0284c7;
-    }
-    .btn-success {
-      background: #10b981;
-      color: #fff;
-    }
-    .btn-success:hover {
-      background: #059669;
-    }
-    .btn-danger {
-      background: #ef4444;
-      color: #fff;
-    }
-    .btn-danger:hover {
-      background: #dc2626;
-    }
-    .btn-ghost {
-      background: #f1f5f9;
-      color: #475569;
-    }
-    .btn-ghost:hover {
-      background: #e2e8f0;
-    }
-    .btn-sm {
-      padding: 0.4rem 0.9rem;
-      font-size: 0.8rem;
-      border-radius: 8px;
-    }
-    .btn-xs {
-      padding: 0.25rem 0.6rem;
-      font-size: 0.7rem;
-      border-radius: 6px;
-    }
-
-    /* ========== TAG / CHIP ========== */
-    .tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.3rem;
-      padding: 0.25rem 0.7rem;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 500;
-    }
-    .tag-blue {
-      background: #eff6ff;
-      color: #2563eb;
-    }
-    .tag-green {
-      background: #ecfdf5;
-      color: #059669;
-    }
-    .tag-orange {
-      background: #fff7ed;
-      color: #ea580c;
-    }
-    .tag-purple {
-      background: #faf5ff;
-      color: #7c3aed;
-    }
-    .tag-gray {
-      background: #f1f5f9;
-      color: #64748b;
-    }
-
-    /* ========== LINK PREVIEW CARD (dalam form) ========== */
-    .link-preview-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.5rem;
-      padding: 0.6rem 0.9rem;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      font-size: 0.85rem;
-      transition: all 0.15s ease;
-    }
-    .link-preview-item:hover {
-      background: #f1f5f9;
-    }
-    .link-preview-item .link-info {
-      flex: 1;
-      min-width: 0;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .link-preview-item .link-name {
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .link-preview-item .link-url {
-      color: #64748b;
-      font-size: 0.75rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 180px;
-    }
-
-    /* ========== MODAL OVERLAY ========== */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.5);
-      backdrop-filter: blur(4px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      padding: 1rem;
-      animation: fadeIn 0.2s ease;
-    }
-    .modal-overlay.hidden {
-      display: none;
-    }
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
-    }
-    .modal-box {
-      background: #ffffff;
-      border-radius: 20px;
-      padding: 1.8rem;
-      width: 100%;
-      max-width: 420px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
-      animation: slideUp 0.25s ease;
-    }
-    @keyframes slideUp {
-      from {
-        transform: translateY(20px);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-
-    /* ========== MICROSITE CARD (di list) ========== */
-    .microsite-card {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 16px;
-      padding: 1.2rem 1.4rem;
-      transition: all 0.2s ease;
-      display: flex;
-      flex-direction: column;
-      gap: 0.6rem;
-    }
-    .microsite-card:hover {
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.07);
-      border-color: #cbd5e1;
-    }
-    .microsite-card .ms-title {
-      font-weight: 700;
-      font-size: 1.05rem;
-      color: #0f172a;
-    }
-    .microsite-card .ms-slug {
-      font-size: 0.78rem;
-      color: #64748b;
-      font-family: 'SF Mono', 'Fira Code', monospace;
-      background: #f1f5f9;
-      padding: 0.15rem 0.5rem;
-      border-radius: 6px;
-      display: inline-block;
-      width: fit-content;
-    }
-    .microsite-card .ms-desc {
-      font-size: 0.85rem;
-      color: #475569;
-      line-height: 1.5;
-    }
-    .microsite-card .ms-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-      align-items: center;
-    }
-
-    /* ========== QR CODE CONTAINER ========== */
-    #qrcode {
-      display: flex;
-      justify-content: center;
-    }
-    #qrcode img {
-      border-radius: 12px;
-      border: 2px solid #e2e8f0;
-    }
-
-    /* ========== RESPONSIVE ========== */
-    @media (max-width: 768px) {
-      .link-preview-item .link-url {
-        max-width: 100px;
-      }
-      .modal-box {
-        margin: 1rem;
-        padding: 1.3rem;
-      }
-    }
-  </style>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 
-<body>
+<body class="p-4 md:p-6 max-w-6xl mx-auto">
 
-  <!-- ==================== LOADING SCREEN ==================== -->
-  <div id="loadingScreen" class="loading-screen">
-    <div class="spinner"></div>
-    <p style="margin-top:1rem;color:#64748b;font-weight:500;">Memuat Dashboard...</p>
-  </div>
-
-  <!-- ==================== MAIN CONTAINER ==================== -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-
-    <!-- HEADER -->
-    <header class="mb-8">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div>
-          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            📋 Dashboard Microsite
-          </h1>
-          <p class="text-slate-500 text-sm mt-1">
-            Kelola semua microsite fasilitator dalam satu tempat
-          </p>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="tag tag-blue text-xs">🟢 Aktif</span>
-          <span class="text-xs text-slate-400" id="totalCount">0 microsite</span>
-        </div>
-      </div>
-    </header>
-
-    <!-- GRID LAYOUT -->
-    <div class="grid lg:grid-cols-12 gap-6">
-
-      <!-- ==================== SIDEBAR KIRI: FORM ==================== -->
-      <aside class="lg:col-span-5 xl:col-span-4">
-        <div class="card sticky top-6">
-          <h2 class="text-lg font-bold text-slate-800 mb-5 flex items-center gap-2">
-            <span>➕</span> Buat / Edit Microsite
-          </h2>
-
-          <!-- Slug -->
-          <div class="mb-4">
-            <label for="slug" class="block text-sm font-semibold text-slate-600 mb-1.5">
-              Slug <span class="text-red-400">*</span>
-            </label>
-            <input
-            id="slug"
-            type="text"
-            placeholder="contoh-slug-tanpa-spasi"
-            class="input-field"
-            autocomplete="off"
-            >
-            <p class="text-xs text-slate-400 mt-1">Digunakan sebagai URL: <code class="bg-slate-100 px-1 rounded">/microsite/contoh-slug</code></p>
-          </div>
-
-          <!-- Judul -->
-          <div class="mb-4">
-            <label for="title" class="block text-sm font-semibold text-slate-600 mb-1.5">
-              Judul Microsite
-            </label>
-            <input
-            id="title"
-            type="text"
-            placeholder="Judul menarik untuk microsite"
-            class="input-field"
-            >
-          </div>
-
-          <!-- Deskripsi -->
-          <div class="mb-4">
-            <label for="desc" class="block text-sm font-semibold text-slate-600 mb-1.5">
-              Deskripsi Singkat
-            </label>
-            <textarea
-            id="desc"
-            rows="2"
-            placeholder="Deskripsikan isi microsite ini..."
-            class="input-field resize-none"
-          ></textarea>
-        </div>
-
-        <!-- Kategori -->
-        <div class="mb-5">
-          <label for="micrositeCategory" class="block text-sm font-semibold text-slate-600 mb-1.5">
-            Kategori
-          </label>
-          <select id="micrositeCategory" class="select-field">
-            <option value="OPD">🏘️ OPD</option>
-            <option value="Kecamatan">🏢 Kecamatan</option>
-            <option value="Dokumen">📄 Dokumen</option>
-            <option value="FASILITATOR">🔒 FASILITATOR</option>
-            <option value="Publik">🌐 Publik</option>
-            <option value="Lainnya">📁 Lainnya</option>
-          </select>
-        </div>
-
-        <!-- Daftar Link -->
-        <div class="mb-5">
-          <div class="flex items-center justify-between mb-2.5">
-            <label class="text-sm font-semibold text-slate-600">
-              🔗 Daftar Link
-            </label>
-            <button onclick="addLink()" class="btn btn-success btn-sm text-xs">
-              + Tambah Link
-            </button>
-          </div>
-
-          <!-- Container link preview -->
-          <div id="links" class="space-y-2 max-h-56 overflow-y-auto pr-1">
-            <!-- Akan diisi oleh JavaScript -->
-            <p class="text-xs text-slate-400 italic text-center py-4" id="emptyLinkPlaceholder">
-              Belum ada link. Klik "Tambah Link" untuk menambahkan.
-            </p>
-          </div>
-        </div>
-
-        <!-- Tombol Simpan -->
-        <button onclick="save()" class="btn btn-primary w-full text-base py-3">
-          💾 Simpan Microsite
-        </button>
-      </div>
-    </aside>
-
-    <!-- ==================== KANAN: DAFTAR MICROSITE ==================== -->
-    <main class="lg:col-span-7 xl:col-span-8">
-      <div class="card mb-5">
-        <div class="flex items-center justify-between">
-          <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-            <span>📊</span> Daftar Microsite
-          </h2>
-          <button onclick="refreshList()" class="btn btn-ghost btn-sm text-xs" title="Segarkan data">
-            🔄 Refresh
-          </button>
-        </div>
-      </div>
-
-      <!-- Grid daftar microsite -->
-      <div id="list" class="grid sm:grid-cols-1 xl:grid-cols-2 gap-4">
-        <!-- Akan diisi oleh JavaScript -->
-        <div class="col-span-full text-center py-10 text-slate-400">
-          <p class="text-4xl mb-2">📭</p>
-          <p class="text-sm">Belum ada microsite yang dibuat.</p>
-          <p class="text-xs">Isi form di samping untuk membuat yang pertama!</p>
-        </div>
-      </div>
-    </main>
-  </div>
+<!-- LOADING -->
+<div id="loadingScreen">
+  <div class="loader"></div>
+  <p class="mt-4 text-cyan-300">Memuat Dashboard...</p>
 </div>
 
-<!-- ==================== MODAL TAMBAH LINK ==================== -->
-<div id="modalLink" class="modal-overlay hidden">
-  <div class="modal-box">
-    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-      🔗 Tambah Link Baru
-    </h3>
+<!-- HEADER -->
+<div class="mb-6 fade">
+  <h1 class="text-3xl font-bold neon">
+    🚀 Dashboard Microsite
+  </h1>
+  <p class="opacity-70">
+    Kelola microsite fasilitator dengan mudah
+  </p>
+</div>
 
-    <div class="mb-3">
-      <label for="linkName" class="block text-sm font-semibold text-slate-600 mb-1">
-        Nama Link
-      </label>
-      <input id="linkName" type="text" placeholder="Contoh: Panduan PDF" class="input-field">
-    </div>
+<!-- GRID -->
+<div class="grid lg:grid-cols-3 gap-6">
 
-    <div class="mb-3">
-      <label for="linkUrl" class="block text-sm font-semibold text-slate-600 mb-1">
-        URL Tujuan
-      </label>
-      <input id="linkUrl" type="url" placeholder="https://..." class="input-field">
-    </div>
+  <!-- FORM -->
+  <div class="lg:col-span-1 glass p-5 rounded-2xl fade">
 
+    <h2 class="text-xl font-bold mb-4 neon">
+      ➕ Buat Microsite
+    </h2>
+
+    <!-- INFO -->
     <div class="mb-5">
-      <label for="linkCategory" class="block text-sm font-semibold text-slate-600 mb-1">
-        Kategori Link
-      </label>
-      <select id="linkCategory" class="select-field">
+      <h3 class="text-sm opacity-70 mb-2">
+        Informasi Microsite
+      </h3>
+
+      <input
+        id="slug"
+        placeholder="slug-contoh-tidak-ada-spasi"
+        class="w-full p-3 text-black rounded-lg mb-3"
+      >
+
+      <input
+        id="title"
+        placeholder="Judul Microsite"
+        class="w-full p-3 text-black rounded-lg mb-3"
+      >
+
+      <input
+        id="desc"
+        placeholder="Deskripsi"
+        class="w-full p-3 text-black rounded-lg mb-3"
+      >
+
+      <!-- KATEGORI MICROSITE -->
+      <select
+        id="micrositeCategory"
+        class="w-full p-3 text-black rounded-lg"
+      >
+        <option value="OPD">🏘️ OPD</option>
+        <option value="Kecamatan">🏢 Kecamatan</option>
         <option value="Dokumen">📄 Dokumen</option>
-        <option value="Website">🌐 Website</option>
-        <option value="Spreadsheet">📊 Spreadsheet</option>
-        <option value="Drive">📂 Drive</option>
-        <option value="Lainnya">🔗 Lainnya</option>
+        <option value="FASILITATOR">🔒 FASILITATOR</option>
+        <option value="Publik">🌐 Publik</option>
+        <option value="Lainnya">📁 Lainnya</option>
       </select>
     </div>
 
+    <!-- DAFTAR LINK -->
+    <div class="mb-5">
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="text-sm opacity-70">
+          Daftar Link
+        </h3>
+
+        <button
+          onclick="addLink()"
+          class="bg-green-500 px-3 py-1 rounded-lg text-black font-semibold"
+        >
+          + Tambah
+        </button>
+      </div>
+
+      <div id="links" class="space-y-2"></div>
+    </div>
+
+    <!-- SAVE -->
+    <button
+      onclick="save()"
+      class="w-full bg-cyan-500 text-black font-bold py-3 rounded-xl"
+    >
+      💾 Simpan Microsite
+    </button>
+
+  </div>
+
+  <!-- DATA -->
+  <div class="lg:col-span-2 fade">
+
+    <div class="glass p-5 rounded-2xl mb-4">
+      <h2 class="text-xl font-bold neon">
+        📊 Data Microsite
+      </h2>
+      <p class="opacity-70 text-sm">
+        Semua microsite yang sudah dibuat
+      </p>
+    </div>
+
+    <div id="list" class="grid md:grid-cols-2 gap-4"></div>
+
+  </div>
+
+</div>
+
+<!-- MODAL LINK -->
+<div
+  id="modalLink"
+  class="hidden fixed inset-0 bg-black/70 flex items-center justify-center p-4"
+>
+  <div class="glass p-6 rounded-2xl w-full max-w-sm fade">
+
+    <h2 class="text-lg mb-4 neon">
+      🔗 Tambah Link
+    </h2>
+
+    <input
+      id="linkName"
+      placeholder="Nama Link"
+      class="w-full p-3 text-black rounded-lg mb-3"
+    >
+
+    <input
+      id="linkUrl"
+      placeholder="https://..."
+      class="w-full p-3 text-black rounded-lg mb-3"
+    >
+
+    <!-- KATEGORI LINK -->
+    <select
+      id="linkCategory"
+      class="w-full p-3 text-black rounded-lg mb-4"
+    >
+      <option value="Dokumen">📄 Dokumen</option>
+      <option value="Website">🌐 Website</option>
+      <option value="Spreadsheet">📊 Spreadsheet</option>
+      <option value="Drive">📂 Drive</option>
+      <option value="Lainnya">🔗 Lainnya</option>
+    </select>
+
     <div class="flex gap-2 justify-end">
-      <button onclick="closeModal()" class="btn btn-ghost">
+
+      <button
+        onclick="closeModal()"
+        class="bg-gray-500 px-4 py-2 rounded-lg"
+      >
         Batal
       </button>
-      <button onclick="saveLink()" class="btn btn-primary">
-        ✅ Simpan Link
+
+      <button
+        onclick="saveLink()"
+        class="bg-cyan-500 text-black px-4 py-2 rounded-lg"
+      >
+        Simpan
       </button>
+
     </div>
   </div>
 </div>
 
-<!-- ==================== MODAL QR CODE ==================== -->
-<div id="qrModal" class="modal-overlay hidden">
-  <div class="modal-box text-center">
-    <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center justify-center gap-2">
-      📱 QR Code Microsite
-    </h3>
-    <p class="text-sm text-slate-500 mb-4" id="qrSlugLabel">slug-micosite</p>
+<!-- MODAL QR -->
+<div
+  id="qrModal"
+  class="hidden fixed inset-0 bg-black/70 flex items-center justify-center p-4"
+>
+  <div class="glass p-6 rounded-2xl text-center fade">
 
-    <div id="qrcode" class="mb-5 flex justify-center"></div>
+    <h2 class="mb-4 neon text-lg">
+      📱 QR Code
+    </h2>
 
-    <div class="flex gap-2 justify-center flex-wrap">
-      <button onclick="downloadQR()" class="btn btn-success btn-sm">
-        ⬇️ Download PNG
+    <div id="qrcode" class="mb-4 flex justify-center"></div>
+
+    <div class="flex gap-2 justify-center">
+
+      <button
+        onclick="downloadQR()"
+        class="bg-green-500 text-black px-4 py-2 rounded-lg"
+      >
+        ⬇️ Download
       </button>
-      <button onclick="closeQR()" class="btn btn-ghost btn-sm">
-        ✕ Tutup
+
+      <button
+        onclick="closeQR()"
+        class="bg-gray-500 px-4 py-2 rounded-lg"
+      >
+        Tutup
       </button>
+
     </div>
   </div>
 </div>
 
-<!-- ==================== SCRIPTS ==================== -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js">
-</script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js">
-</script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js">
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
-</script>
-
-<!-- admin.js logic (di-inline untuk kemudahan, bisa dipisah ke file terpisah) -->
-<script>
-  // ==================== KONFIGURASI FIREBASE ====================
-  // ⚠️ GANTI dengan konfigurasi Firebase Anda sendiri
-  const firebaseConfig = {
-    apiKey: "AIzaSy...",
-    authDomain: "project.firebaseapp.com",
-    projectId: "project-id",
-    storageBucket: "project.appspot.com",
-    messagingSenderId: "000000",
-    appId: "1:000000:web:xxxxx"
-  };
-
-  // Inisialisasi Firebase
-  let db = null;
-  let firestoreReady = false;
-
-  try {
-    firebase.initializeApp(firebaseConfig);
-    db = firebase.firestore();
-    firestoreReady = true;
-    console.log('✅ Firebase siap');
-  } catch (e) {
-    console.warn('⚠️ Firebase belum dikonfigurasi. Aplikasi berjalan dalam mode demo.');
-    console.warn('Silakan isi firebaseConfig dengan kredensial Anda.');
-  }
-
-  // ==================== STATE ====================
-  let tempLinks = []; // Menyimpan link sementara sebelum disimpan
-  let editingId = null; // ID microsite yang sedang diedit (null = buat baru)
-  let currentQRData = ''; // Data QR yang sedang ditampilkan
-
-  // ==================== DOM READY ====================
-  document.addEventListener('DOMContentLoaded', () => {
-    // Sembunyikan loading screen setelah 1 detik (atau setelah data siap)
-    setTimeout(() => {
-      document.getElementById('loadingScreen').classList.add('hidden');
-    }, 900);
-
-    // Muat daftar microsite
-    loadMicrositeList();
-
-    // Render placeholder link
-    renderLinkPreviews();
-  });
-
-  // ==================== FUNGSI LINK TEMPORER ====================
-  function addLink() {
-    document.getElementById('modalLink').classList.remove('hidden');
-    document.getElementById('linkName').focus();
-  }
-
-  function closeModal() {
-    document.getElementById('modalLink').classList.add('hidden');
-    // Reset form
-    document.getElementById('linkName').value = '';
-    document.getElementById('linkUrl').value = '';
-    document.getElementById('linkCategory').value = 'Dokumen';
-  }
-
-  function saveLink() {
-    const name = document.getElementById('linkName').value.trim();
-    const url = document.getElementById('linkUrl').value.trim();
-    const category = document.getElementById('linkCategory').value;
-
-    if (!name || !url) {
-      alert('⚠️ Nama link dan URL harus diisi.');
-      return;
-    }
-
-    // Validasi URL sederhana
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      alert('⚠️ URL harus diawali dengan http:// atau https://');
-      return;
-    }
-
-    tempLinks.push({
-      name,
-      url,
-      category,
-      id: Date.now().toString() // ID unik sementara
-    });
-
-    renderLinkPreviews();
-    closeModal();
-  }
-
-  function removeTempLink(id) {
-    tempLinks = tempLinks.filter(link => link.id !== id);
-    renderLinkPreviews();
-  }
-
-  function renderLinkPreviews() {
-    const container = document.getElementById('links');
-    const placeholder = document.getElementById('emptyLinkPlaceholder');
-
-    if (tempLinks.length === 0) {
-      container.innerHTML = '';
-      if (placeholder) placeholder.style.display = 'block';
-      container.appendChild(placeholder || createPlaceholder());
-      return;
-    }
-
-    if (placeholder) placeholder.style.display = 'none';
-
-    container.innerHTML = tempLinks.map(link => {
-      const catTag = getCategoryTag(link.category);
-      return `
-              <div class="link-preview-item">
-                <div class="link-info">
-                  <span class="link-name" title="${escapeHtml(link.name)}">${escapeHtml(link.name)}</span>
-                  <span class="tag ${catTag}">${link.category}</span>
-                </div>
-                <div class="flex items-center gap-1 flex-shrink-0">
-                  <span class="link-url hidden sm:inline" title="${escapeHtml(link.url)}">${escapeHtml(link.url)}</span>
-                  <button
-                    onclick="removeTempLink('${link.id}')"
-                    class="btn btn-danger btn-xs"
-                    title="Hapus link"
-                    style="padding:0.2rem 0.4rem;font-size:0.65rem;"
-                  >
-                    ✕
-                  </button>
-                </div>
-              </div>
-            `;
-    }).join('');
-  }
-
-  function createPlaceholder() {
-    const p = document.createElement('p');
-    p.id = 'emptyLinkPlaceholder';
-    p.className = 'text-xs text-slate-400 italic text-center py-4';
-    p.textContent = 'Belum ada link. Klik "Tambah Link" untuk menambahkan.';
-    return p;
-  }
-
-  function getCategoryTag(category) {
-    const map = {
-      'Dokumen': 'tag-blue',
-      'Website': 'tag-green',
-      'Spreadsheet': 'tag-orange',
-      'Drive': 'tag-purple',
-      'Lainnya': 'tag-gray'
-    };
-    return map[category] || 'tag-gray';
-  }
-
-  function escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
-
-  // ==================== SIMPAN MICROSITE ====================
-  async function save() {
-    const slug = document.getElementById('slug').value.trim();
-    const title = document.getElementById('title').value.trim();
-    const desc = document.getElementById('desc').value.trim();
-    const category = document.getElementById('micrositeCategory').value;
-
-    // Validasi
-    if (!slug) {
-      alert('⚠️ Slug wajib diisi.');
-      document.getElementById('slug').focus();
-      return;
-    }
-    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
-      alert('⚠️ Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung. Tidak boleh ada spasi.');
-      document.getElementById('slug').focus();
-      return;
-    }
-    if (!title) {
-      alert('⚠️ Judul microsite wajib diisi.');
-      document.getElementById('title').focus();
-      return;
-    }
-    if (tempLinks.length === 0) {
-      alert('⚠️ Minimal satu link harus ditambahkan.');
-      return;
-    }
-
-    const micrositeData = {
-      slug,
-      title,
-      description: desc,
-      category,
-      links: tempLinks.map(l => ({
-        name: l.name,
-        url: l.url,
-        category: l.category
-      })),
-      updatedAt: new Date().toISOString(),
-      createdAt: editingId ? undefined : new Date().toISOString()
-    };
-
-    // Hapus createdAt jika sedang edit
-    if (editingId) {
-      delete micrositeData.createdAt;
-    }
-
-    try {
-      if (!firestoreReady || !db) {
-        // Mode demo: simpan ke localStorage
-        saveToLocalStorage(micrositeData, editingId);
-        showToast('✅ Microsite berhasil disimpan (mode lokal).');
-      } else {
-        // Mode Firebase
-        if (editingId) {
-          await db.collection('microsites').doc(editingId).update(micrositeData);
-        } else {
-          await db.collection('microsites').add(micrositeData);
-        }
-        showToast('✅ Microsite berhasil disimpan ke server.');
-      }
-
-      // Reset form
-      resetForm();
-      loadMicrositeList();
-    } catch (error) {
-      console.error('Gagal menyimpan:', error);
-      alert('❌ Gagal menyimpan microsite. Silakan coba lagi.');
-    }
-  }
-
-  function saveToLocalStorage(data, editId) {
-    let microsites = JSON.parse(localStorage.getItem('microsites') || '[]');
-    if (editId) {
-      const index = microsites.findIndex(m => m.id === editId);
-      if (index !== -1) {
-        microsites[index] = { ...microsites[index], ...data, id: editId };
-      }
-    } else {
-      data.id = 'local_' + Date.now();
-      microsites.push(data);
-    }
-    localStorage.setItem('microsites', JSON.stringify(microsites));
-  }
-
-  function resetForm() {
-    document.getElementById('slug').value = '';
-    document.getElementById('title').value = '';
-    document.getElementById('desc').value = '';
-    document.getElementById('micrositeCategory').value = 'OPD';
-    tempLinks = [];
-    editingId = null;
-    renderLinkPreviews();
-    // Ubah teks tombol
-    const saveBtn = document.querySelector('button[onclick="save()"]');
-    if (saveBtn) saveBtn.innerHTML = '💾 Simpan Microsite';
-  }
-
-  // ==================== LOAD DAFTAR MICROSITE ====================
-  async function loadMicrositeList() {
-    const listContainer = document.getElementById('list');
-    listContainer.innerHTML =
-      '<div class="col-span-full text-center py-6 text-slate-400"><div class="spinner" style="margin:0 auto 1rem;"></div><p class="text-sm">Memuat data...</p></div>';
-
-    try {
-      let microsites = [];
-
-      if (!firestoreReady || !db) {
-        // Mode lokal
-        microsites = JSON.parse(localStorage.getItem('microsites') || '[]');
-      } else {
-        const snapshot = await db.collection('microsites').orderBy('updatedAt', 'desc').get();
-        microsites = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      }
-
-      document.getElementById('totalCount').textContent = microsites.length + ' microsite';
-      renderMicrositeList(microsites);
-    } catch (error) {
-      console.error('Gagal memuat daftar:', error);
-      listContainer.innerHTML =
-        '<div class="col-span-full text-center py-10 text-red-400"><p>❌ Gagal memuat data.</p><button onclick="loadMicrositeList()" class="btn btn-ghost btn-sm mt-3">Coba Lagi</button></div>';
-    }
-  }
-
-  function renderMicrositeList(microsites) {
-    const listContainer = document.getElementById('list');
-
-    if (microsites.length === 0) {
-      listContainer.innerHTML = `
-              <div class="col-span-full text-center py-10 text-slate-400">
-                <p class="text-4xl mb-2">📭</p>
-                <p class="text-sm">Belum ada microsite yang dibuat.</p>
-                <p class="text-xs">Isi form di samping untuk membuat yang pertama!</p>
-              </div>
-            `;
-      return;
-    }
-
-    listContainer.innerHTML = microsites.map(ms => {
-      const catEmoji = getCategoryEmoji(ms.category);
-      const linkCount = ms.links ? ms.links.length : 0;
-      const updatedDate = ms.updatedAt ? new Date(ms.updatedAt).toLocaleDateString('id-ID', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric'
-      }) : '-';
-
-      return `
-              <div class="microsite-card">
-                <div class="flex items-start justify-between gap-2">
-                  <div class="ms-title flex items-center gap-2">
-                    ${catEmoji} ${escapeHtml(ms.title || 'Tanpa Judul')}
-                  </div>
-                  <span class="tag tag-gray flex-shrink-0">${linkCount} link</span>
-                </div>
-                <code class="ms-slug">/${escapeHtml(ms.slug)}</code>
-                <p class="ms-desc">${escapeHtml(ms.description || 'Tidak ada deskripsi.')}</p>
-                <div class="ms-meta">
-                  <span class="tag tag-blue">${escapeHtml(ms.category || 'Lainnya')}</span>
-                  <span class="text-xs text-slate-400 ml-auto">🕒 ${updatedDate}</span>
-                </div>
-                <div class="flex gap-1.5 mt-1 flex-wrap">
-                  <button
-                    onclick="editMicrosite('${ms.id}')"
-                    class="btn btn-ghost btn-xs"
-                  >
-                    ✏️ Edit
-                  </button>
-                  <button
-                    onclick="showQR('${ms.slug}', '${escapeHtml(ms.title || ms.slug)}')"
-                    class="btn btn-ghost btn-xs"
-                  >
-                    📱 QR
-                  </button>
-                  <button
-                    onclick="deleteMicrosite('${ms.id}')"
-                    class="btn btn-danger btn-xs"
-                  >
-                    🗑️ Hapus
-                  </button>
-                </div>
-              </div>
-            `;
-    }).join('');
-  }
-
-  function getCategoryEmoji(category) {
-    const map = {
-      'OPD': '🏘️',
-      'Kecamatan': '🏢',
-      'Dokumen': '📄',
-      'FASILITATOR': '🔒',
-      'Publik': '🌐',
-      'Lainnya': '📁'
-    };
-    return map[category] || '📁';
-  }
-
-  // ==================== EDIT MICROSITE ====================
-  async function editMicrosite(id) {
-    try {
-      let microsite = null;
-
-      if (!firestoreReady || !db) {
-        const microsites = JSON.parse(localStorage.getItem('microsites') || '[]');
-        microsite = microsites.find(m => m.id === id);
-      } else {
-        const doc = await db.collection('microsites').doc(id).get();
-        if (doc.exists) {
-          microsite = { id: doc.id, ...doc.data() };
-        }
-      }
-
-      if (!microsite) {
-        alert('❌ Microsite tidak ditemukan.');
-        return;
-      }
-
-      // Isi form
-      document.getElementById('slug').value = microsite.slug || '';
-      document.getElementById('title').value = microsite.title || '';
-      document.getElementById('desc').value = microsite.description || '';
-      document.getElementById('micrositeCategory').value = microsite.category || 'OPD';
-
-      // Isi temp links
-      tempLinks = (microsite.links || []).map((l, i) => ({
-        name: l.name,
-        url: l.url,
-        category: l.category || 'Lainnya',
-        id: 'edit_' + i + '_' + Date.now()
-      }));
-      renderLinkPreviews();
-
-      editingId = id;
-      const saveBtn = document.querySelector('button[onclick="save()"]');
-      if (saveBtn) saveBtn.innerHTML = '✏️ Update Microsite';
-
-      // Scroll ke form
-      document.getElementById('slug').scrollIntoView({ behavior: 'smooth', block: 'center' });
-      document.getElementById('slug').focus();
-
-      showToast('📝 Silakan edit data microsite.');
-    } catch (error) {
-      console.error('Gagal edit:', error);
-      alert('❌ Gagal memuat data untuk diedit.');
-    }
-  }
-
-  // ==================== HAPUS MICROSITE ====================
-  async function deleteMicrosite(id) {
-    if (!confirm('⚠️ Apakah Anda yakin ingin menghapus microsite ini? Tindakan ini tidak dapat dibatalkan.')) {
-      return;
-    }
-
-    try {
-      if (!firestoreReady || !db) {
-        const microsites = JSON.parse(localStorage.getItem('microsites') || '[]');
-        const filtered = microsites.filter(m => m.id !== id);
-        localStorage.setItem('microsites', JSON.stringify(filtered));
-      } else {
-        await db.collection('microsites').doc(id).delete();
-      }
-
-      showToast('🗑️ Microsite berhasil dihapus.');
-      loadMicrositeList();
-
-      // Jika yang dihapus sedang diedit, reset form
-      if (editingId === id) {
-        resetForm();
-      }
-    } catch (error) {
-      console.error('Gagal menghapus:', error);
-      alert('❌ Gagal menghapus microsite.');
-    }
-  }
-
-  // ==================== QR CODE ====================
-  function showQR(slug, title) {
-    const modal = document.getElementById('qrModal');
-    const qrContainer = document.getElementById('qrcode');
-    const slugLabel = document.getElementById('qrSlugLabel');
-
-    // Bersihkan QR sebelumnya
-    qrContainer.innerHTML = '';
-
-    // URL microsite (ganti dengan domain asli)
-    const baseUrl = window.location.origin;
-    const micrositeUrl = `${baseUrl}/microsite/${slug}`;
-    currentQRData = micrositeUrl;
-    slugLabel.textContent = slug;
-
-    // Generate QR
-    try {
-      new QRCode(qrContainer, {
-        text: micrositeUrl,
-        width: 200,
-        height: 200,
-        colorDark: '#1e293b',
-        colorLight: '#ffffff',
-        correctLevel: QRCode.CorrectLevel.H
-      });
-    } catch (e) {
-      qrContainer.innerHTML = '<p class="text-red-500 text-sm">Gagal generate QR Code</p>';
-      console.error(e);
-    }
-
-    modal.classList.remove('hidden');
-  }
-
-  function closeQR() {
-    document.getElementById('qrModal').classList.add('hidden');
-    document.getElementById('qrcode').innerHTML = '';
-    currentQRData = '';
-  }
-
-  function downloadQR() {
-    const qrImg = document.querySelector('#qrcode img');
-    if (!qrImg) {
-      alert('⚠️ QR Code belum digenerate.');
-      return;
-    }
-
-    // Buat canvas untuk download
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.src = qrImg.src;
-
-    img.onload = () => {
-      canvas.width = img.width + 40;
-      canvas.height = img.height + 60;
-      // Background putih
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      // Gambar QR
-      ctx.drawImage(img, 20, 10);
-      // Teks slug
-      ctx.fillStyle = '#1e293b';
-      ctx.font = 'bold 14px Inter, system-ui, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(currentQRData.split('/').pop() || '', canvas.width / 2, canvas.height - 12);
-
-      // Trigger download
-      const link = document.createElement('a');
-      link.download = `qr-microsite-${Date.now()}.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-      showToast('⬇️ QR Code berhasil diunduh.');
-    };
-  }
-
-  // ==================== REFRESH LIST ====================
-  function refreshList() {
-    loadMicrositeList();
-    showToast('🔄 Data diperbarui.');
-  }
-
-  // ==================== TOAST NOTIFICATION ====================
-  function showToast(message) {
-    // Hapus toast lama jika ada
-    const existingToast = document.querySelector('.toast-notification');
-    if (existingToast) existingToast.remove();
-
-    const toast = document.createElement('div');
-    toast.className = 'toast-notification';
-    toast.style.cssText = `
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            background: #1e293b;
-            color: #fff;
-            padding: 0.8rem 1.4rem;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            z-index: 9999;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-            animation: slideUp 0.3s ease;
-            max-width: 90vw;
-          `;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-
-    setTimeout(() => {
-      toast.style.opacity = '0';
-      toast.style.transition = 'opacity 0.3s ease';
-      setTimeout(() => toast.remove(), 300);
-    }, 2500);
-  }
-
-  // ==================== TUTUP MODAL DENGAN ESC ====================
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      if (!document.getElementById('modalLink').classList.contains('hidden')) {
-        closeModal();
-      }
-      if (!document.getElementById('qrModal').classList.contains('hidden')) {
-        closeQR();
-      }
-    }
-  });
-
-  // Tutup modal saat klik di luar konten
-  document.getElementById('modalLink').addEventListener('click', function(e) {
-    if (e.target === this) closeModal();
-  });
-  document.getElementById('qrModal').addEventListener('click', function(e) {
-    if (e.target === this) closeQR();
-  });
-
-  console.log('🚀 Dashboard siap digunakan.');
-  console.log('📝 Mode:', firestoreReady ? 'Firebase' : 'LocalStorage (demo)');
-</script>
+<script src="admin.js"></script>
 </body>
 </html>
