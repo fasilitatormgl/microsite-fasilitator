@@ -54,7 +54,7 @@
 
       <input
         id="slug"
-        placeholder="slug-contoh-tidak-ada-spasi"
+        placeholder="link-akses-tidak-ada-spasi"
         class="w-full p-3 text-black rounded-lg mb-3"
       >
 
@@ -97,6 +97,23 @@
         >
           + Tambah
         </button>
+      </div>
+
+      <!-- FILTER & SEARCH LINK (BARU) -->
+      <div class="mt-2 mb-2 space-y-2">
+        <input
+          type="text"
+          id="linkSearch"
+          placeholder="🔍 Cari link (nama/URL)..."
+          class="w-full p-2 text-black rounded-lg text-sm"
+        >
+        <div class="flex flex-wrap gap-1" id="categoryFilters">
+          <button class="cat-filter-btn active" data-cat="Dokumen">📄 Dokumen</button>
+          <button class="cat-filter-btn active" data-cat="Website">🌐 Website</button>
+          <button class="cat-filter-btn active" data-cat="Spreadsheet">📊 Spreadsheet</button>
+          <button class="cat-filter-btn active" data-cat="Drive">📂 Drive</button>
+          <button class="cat-filter-btn active" data-cat="Lainnya">🔗 Lainnya</button>
+        </div>
       </div>
 
       <div id="links" class="space-y-2"></div>
@@ -230,7 +247,7 @@
 
 <script src="admin.js"></script>
 
-<!-- SCRIPT PENCARIAN (TAMBAHAN BARU) -->
+<!-- SCRIPT PENCARIAN MICROSITE -->
 <script>
   // Fitur pencarian microsite secara real-time
   document.addEventListener('DOMContentLoaded', function() {
@@ -241,14 +258,132 @@
         const cards = document.querySelectorAll('#list > div');
         
         cards.forEach(card => {
-          // Ambil seluruh teks di dalam kartu (slug, judul, deskripsi, dll.)
           const cardText = card.textContent?.toLowerCase() || '';
-          // Sembunyikan/tampilkan berdasarkan apakah teks mengandung kata kunci
           card.style.display = cardText.includes(filter) ? '' : 'none';
         });
       });
     }
   });
+</script>
+
+<!-- SCRIPT FILTER & SEARCH LINK (BARU) -->
+<script>
+  (function() {
+    // State filter kategori (semua aktif awalnya)
+    const activeCategories = new Set(['Dokumen', 'Website', 'Spreadsheet', 'Drive', 'Lainnya']);
+
+    // Fungsi untuk menambahkan data-category ke elemen link jika belum ada
+    function updateLinkCategories() {
+      const linkElements = document.querySelectorAll('#links > div');
+      linkElements.forEach(el => {
+        if (el.hasAttribute('data-category')) return; // sudah ada
+        const text = el.textContent || '';
+        // Deteksi kategori dari teks (periksa satu per satu)
+        const categories = ['Dokumen', 'Website', 'Spreadsheet', 'Drive', 'Lainnya'];
+        for (const cat of categories) {
+          if (text.includes(cat)) {
+            el.setAttribute('data-category', cat);
+            break;
+          }
+        }
+        // Fallback jika tidak terdeteksi
+        if (!el.hasAttribute('data-category')) {
+          el.setAttribute('data-category', 'Lainnya');
+        }
+      });
+    }
+
+    // Fungsi utama untuk menerapkan filter + search
+    function applyLinkFilters() {
+      const searchTerm = document.getElementById('linkSearch')?.value.toLowerCase().trim() || '';
+      const linkElements = document.querySelectorAll('#links > div');
+      
+      updateLinkCategories();
+
+      linkElements.forEach(el => {
+        const cat = el.getAttribute('data-category') || 'Lainnya';
+        const text = el.textContent?.toLowerCase() || '';
+        const matchSearch = searchTerm === '' || text.includes(searchTerm);
+        const catActive = activeCategories.has(cat);
+
+        // Tampilkan jika:
+        // - Kategori aktif DAN cocok search, ATAU
+        // - Search tidak kosong DAN cocok search (meskipun kategori tidak aktif)
+        const show = (catActive && matchSearch) || (searchTerm !== '' && matchSearch);
+        el.style.display = show ? '' : 'none';
+      });
+    }
+
+    // Inisialisasi tombol filter
+    function initCategoryButtons() {
+      const buttons = document.querySelectorAll('#categoryFilters .cat-filter-btn');
+      buttons.forEach(btn => {
+        btn.addEventListener('click', function() {
+          const cat = this.getAttribute('data-cat');
+          if (activeCategories.has(cat)) {
+            activeCategories.delete(cat);
+            this.classList.remove('active');
+            this.style.opacity = '0.5';
+          } else {
+            activeCategories.add(cat);
+            this.classList.add('active');
+            this.style.opacity = '1';
+          }
+          applyLinkFilters();
+        });
+        // Set tampilan awal
+        if (activeCategories.has(btn.getAttribute('data-cat'))) {
+          btn.classList.add('active');
+          btn.style.opacity = '1';
+        } else {
+          btn.classList.remove('active');
+          btn.style.opacity = '0.5';
+        }
+        // Gaya dasar tombol
+        btn.style.padding = '0.25rem 0.6rem';
+        btn.style.borderRadius = '9999px';
+        btn.style.fontSize = '0.7rem';
+        btn.style.fontWeight = '600';
+        btn.style.cursor = 'pointer';
+        btn.style.transition = 'all 0.2s';
+        btn.style.background = '#e2e8f0';
+        btn.style.color = '#1e293b';
+        btn.style.border = 'none';
+      });
+    }
+
+    // Listener untuk input search link
+    function initLinkSearch() {
+      const searchInput = document.getElementById('linkSearch');
+      if (searchInput) {
+        searchInput.addEventListener('input', applyLinkFilters);
+      }
+    }
+
+    // Observer untuk mendeteksi perubahan di #links (saat admin.js render ulang)
+    function observeLinkContainer() {
+      const target = document.getElementById('links');
+      if (!target) return;
+      const observer = new MutationObserver(() => {
+        applyLinkFilters();
+      });
+      observer.observe(target, { childList: true, subtree: true });
+    }
+
+    // Jalankan setelah halaman siap
+    function ready() {
+      initCategoryButtons();
+      initLinkSearch();
+      observeLinkContainer();
+      applyLinkFilters(); // terapkan pertama kali
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', ready);
+    } else {
+      ready();
+    }
+  })();
 </script>
 
 </body>
