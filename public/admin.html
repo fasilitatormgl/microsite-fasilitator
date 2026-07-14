@@ -54,7 +54,7 @@
 
       <input
         id="slug"
-        placeholder="link-akses-tidak-ada-spasi"
+        placeholder="slug-contoh-tidak-ada-spasi"
         class="w-full p-3 text-black rounded-lg mb-3"
       >
 
@@ -99,7 +99,7 @@
         </button>
       </div>
 
-      <!-- FILTER & SEARCH LINK (BARU) -->
+      <!-- FILTER & SEARCH LINK -->
       <div class="mt-2 mb-2 space-y-2">
         <input
           type="text"
@@ -140,7 +140,7 @@
         Semua microsite yang sudah dibuat
       </p>
       
-      <!-- SEARCH BAR (TAMBAHAN BARU) -->
+      <!-- SEARCH BAR -->
       <div class="mt-3">
         <input
           type="text"
@@ -148,6 +148,16 @@
           placeholder="🔍 Cari microsite (judul, slug, deskripsi)..."
           class="w-full p-3 text-black rounded-lg"
         >
+      </div>
+
+      <!-- FILTER KATEGORI MICROSITE (BARU) -->
+      <div class="mt-3 flex flex-wrap gap-1" id="micrositeCategoryFilters">
+        <button class="ms-cat-filter-btn active" data-cat="OPD">🏘️ OPD</button>
+        <button class="ms-cat-filter-btn active" data-cat="Kecamatan">🏢 Kecamatan</button>
+        <button class="ms-cat-filter-btn active" data-cat="Dokumen">📄 Dokumen</button>
+        <button class="ms-cat-filter-btn active" data-cat="FASILITATOR">🔒 FASILITATOR</button>
+        <button class="ms-cat-filter-btn active" data-cat="Publik">🌐 Publik</button>
+        <button class="ms-cat-filter-btn active" data-cat="Lainnya">📁 Lainnya</button>
       </div>
     </div>
 
@@ -247,38 +257,16 @@
 
 <script src="admin.js"></script>
 
-<!-- SCRIPT PENCARIAN MICROSITE -->
-<script>
-  // Fitur pencarian microsite secara real-time
-  document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-      searchInput.addEventListener('input', function(e) {
-        const filter = e.target.value.toLowerCase().trim();
-        const cards = document.querySelectorAll('#list > div');
-        
-        cards.forEach(card => {
-          const cardText = card.textContent?.toLowerCase() || '';
-          card.style.display = cardText.includes(filter) ? '' : 'none';
-        });
-      });
-    }
-  });
-</script>
-
-<!-- SCRIPT FILTER & SEARCH LINK (BARU) -->
+<!-- ==================== SCRIPT UNTUK LINK (FILTER & SEARCH) ==================== -->
 <script>
   (function() {
-    // State filter kategori (semua aktif awalnya)
     const activeCategories = new Set(['Dokumen', 'Website', 'Spreadsheet', 'Drive', 'Lainnya']);
 
-    // Fungsi untuk menambahkan data-category ke elemen link jika belum ada
     function updateLinkCategories() {
       const linkElements = document.querySelectorAll('#links > div');
       linkElements.forEach(el => {
-        if (el.hasAttribute('data-category')) return; // sudah ada
+        if (el.hasAttribute('data-category')) return;
         const text = el.textContent || '';
-        // Deteksi kategori dari teks (periksa satu per satu)
         const categories = ['Dokumen', 'Website', 'Spreadsheet', 'Drive', 'Lainnya'];
         for (const cat of categories) {
           if (text.includes(cat)) {
@@ -286,14 +274,12 @@
             break;
           }
         }
-        // Fallback jika tidak terdeteksi
         if (!el.hasAttribute('data-category')) {
           el.setAttribute('data-category', 'Lainnya');
         }
       });
     }
 
-    // Fungsi utama untuk menerapkan filter + search
     function applyLinkFilters() {
       const searchTerm = document.getElementById('linkSearch')?.value.toLowerCase().trim() || '';
       const linkElements = document.querySelectorAll('#links > div');
@@ -306,15 +292,11 @@
         const matchSearch = searchTerm === '' || text.includes(searchTerm);
         const catActive = activeCategories.has(cat);
 
-        // Tampilkan jika:
-        // - Kategori aktif DAN cocok search, ATAU
-        // - Search tidak kosong DAN cocok search (meskipun kategori tidak aktif)
         const show = (catActive && matchSearch) || (searchTerm !== '' && matchSearch);
         el.style.display = show ? '' : 'none';
       });
     }
 
-    // Inisialisasi tombol filter
     function initCategoryButtons() {
       const buttons = document.querySelectorAll('#categoryFilters .cat-filter-btn');
       buttons.forEach(btn => {
@@ -331,7 +313,6 @@
           }
           applyLinkFilters();
         });
-        // Set tampilan awal
         if (activeCategories.has(btn.getAttribute('data-cat'))) {
           btn.classList.add('active');
           btn.style.opacity = '1';
@@ -339,7 +320,6 @@
           btn.classList.remove('active');
           btn.style.opacity = '0.5';
         }
-        // Gaya dasar tombol
         btn.style.padding = '0.25rem 0.6rem';
         btn.style.borderRadius = '9999px';
         btn.style.fontSize = '0.7rem';
@@ -352,7 +332,6 @@
       });
     }
 
-    // Listener untuk input search link
     function initLinkSearch() {
       const searchInput = document.getElementById('linkSearch');
       if (searchInput) {
@@ -360,7 +339,6 @@
       }
     }
 
-    // Observer untuk mendeteksi perubahan di #links (saat admin.js render ulang)
     function observeLinkContainer() {
       const target = document.getElementById('links');
       if (!target) return;
@@ -370,12 +348,127 @@
       observer.observe(target, { childList: true, subtree: true });
     }
 
-    // Jalankan setelah halaman siap
     function ready() {
       initCategoryButtons();
       initLinkSearch();
       observeLinkContainer();
-      applyLinkFilters(); // terapkan pertama kali
+      applyLinkFilters();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', ready);
+    } else {
+      ready();
+    }
+  })();
+</script>
+
+<!-- ==================== SCRIPT UNTUK MICROSITE (FILTER KATEGORI & SEARCH) ==================== -->
+<script>
+  (function() {
+    // State filter kategori microsite (awal semua aktif)
+    const activeCategoriesMS = new Set(['OPD', 'Kecamatan', 'Dokumen', 'FASILITATOR', 'Publik', 'Lainnya']);
+
+    // Menambahkan atribut data-category ke setiap kartu microsite
+    function updateMicrositeCategories() {
+      const cards = document.querySelectorAll('#list > div');
+      cards.forEach(card => {
+        if (card.hasAttribute('data-category')) return;
+        // Cari teks kategori di dalam kartu (biasanya ditampilkan sebagai tag)
+        const text = card.textContent || '';
+        // Urutan pengecekan disesuaikan dengan kemungkinan tampilan
+        if (text.includes('FASILITATOR')) {
+          card.setAttribute('data-category', 'FASILITATOR');
+        } else if (text.includes('Kecamatan')) {
+          card.setAttribute('data-category', 'Kecamatan');
+        } else if (text.includes('OPD')) {
+          card.setAttribute('data-category', 'OPD');
+        } else if (text.includes('Dokumen')) {
+          card.setAttribute('data-category', 'Dokumen');
+        } else if (text.includes('Publik')) {
+          card.setAttribute('data-category', 'Publik');
+        } else {
+          card.setAttribute('data-category', 'Lainnya');
+        }
+      });
+    }
+
+    function applyMicrositeFilters() {
+      const searchTerm = document.getElementById('searchInput')?.value.toLowerCase().trim() || '';
+      const cards = document.querySelectorAll('#list > div');
+      
+      updateMicrositeCategories();
+
+      cards.forEach(card => {
+        const cat = card.getAttribute('data-category') || 'Lainnya';
+        const cardText = card.textContent?.toLowerCase() || '';
+        const matchSearch = searchTerm === '' || cardText.includes(searchTerm);
+        const catActive = activeCategoriesMS.has(cat);
+
+        // Tampilkan jika kategori aktif DAN cocok search, ATAU search aktif DAN cocok (meski kategori nonaktif)
+        const show = (catActive && matchSearch) || (searchTerm !== '' && matchSearch);
+        card.style.display = show ? '' : 'none';
+      });
+    }
+
+    function initMicrositeCategoryButtons() {
+      const buttons = document.querySelectorAll('#micrositeCategoryFilters .ms-cat-filter-btn');
+      buttons.forEach(btn => {
+        btn.addEventListener('click', function() {
+          const cat = this.getAttribute('data-cat');
+          if (activeCategoriesMS.has(cat)) {
+            activeCategoriesMS.delete(cat);
+            this.classList.remove('active');
+            this.style.opacity = '0.5';
+          } else {
+            activeCategoriesMS.add(cat);
+            this.classList.add('active');
+            this.style.opacity = '1';
+          }
+          applyMicrositeFilters();
+        });
+        // Tampilan awal
+        if (activeCategoriesMS.has(btn.getAttribute('data-cat'))) {
+          btn.classList.add('active');
+          btn.style.opacity = '1';
+        } else {
+          btn.classList.remove('active');
+          btn.style.opacity = '0.5';
+        }
+        // Styling
+        btn.style.padding = '0.25rem 0.7rem';
+        btn.style.borderRadius = '9999px';
+        btn.style.fontSize = '0.7rem';
+        btn.style.fontWeight = '600';
+        btn.style.cursor = 'pointer';
+        btn.style.transition = 'all 0.2s';
+        btn.style.background = '#e2e8f0';
+        btn.style.color = '#1e293b';
+        btn.style.border = 'none';
+      });
+    }
+
+    function initMicrositeSearch() {
+      const searchInput = document.getElementById('searchInput');
+      if (searchInput) {
+        searchInput.addEventListener('input', applyMicrositeFilters);
+      }
+    }
+
+    function observeMicrositeList() {
+      const target = document.getElementById('list');
+      if (!target) return;
+      const observer = new MutationObserver(() => {
+        applyMicrositeFilters();
+      });
+      observer.observe(target, { childList: true, subtree: true });
+    }
+
+    function ready() {
+      initMicrositeCategoryButtons();
+      initMicrositeSearch();
+      observeMicrositeList();
+      applyMicrositeFilters();
     }
 
     if (document.readyState === 'loading') {
