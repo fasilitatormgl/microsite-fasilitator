@@ -14,7 +14,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
-<body class="flex flex-col items-center justify-center p-4 min-h-screen">
+<body class="public-page flex flex-col items-center justify-center p-4 min-h-screen">
 
   <div id="app" class="w-full max-w-md transition-all duration-500">
     <div id="loadingScreen"><div class="loader"></div></div>
@@ -74,7 +74,7 @@
         </div>
 
         <div class="marquee-container text-xs text-sky-200 mb-6 font-medium">
-          <span><i class='bx bxs-megaphone mr-1'></i> Info: Microsites by Fasilitator "PRODAMAI" Kota Magelang &nbsp;&nbsp;&nbsp; <i class='bx bx-check-shield mx-1'></i> Sistem Informasi Prodamai</span>
+          <span><i class='bx bxs-megaphone mr-1'></i> Info: Fasilitator PRODAMAI Magelang &nbsp;&nbsp;&nbsp; <i class='bx bx-check-shield mx-1'></i> Sistem Informasi Prodamai</span>
         </div>
 
         <div id="links" class="space-y-3 mb-8"></div>
@@ -108,7 +108,7 @@
         <a href="https://siomaimagelang.web.app/" target="_blank" class="font-bold text-sky-400 hover:text-sky-300 flex justify-center items-center gap-1 mb-1 text-sm transition-colors">
           <i class='bx bx-link-external'></i> SIOMAI - Sistem Informasi Prodamai
         </a>
-        <p>Made by Koord Prodamai Penunggu kantor - all rights reserved -</p>
+        <p>by Koord Prodamai Penunggu kantor</p>
       </footer>
       `;
 
@@ -126,12 +126,12 @@
 
           linksHTML += `
           <a href="${l.url}" target="_blank" rel="noopener noreferrer" 
-            class="group bg-white/5 hover:bg-white/15 border border-white/10 block p-4 rounded-xl transition-all duration-300 w-full flex items-center gap-3 active:scale-95">
-            <div class="bg-white/10 p-2 rounded-lg group-hover:bg-sky-500/20 group-hover:text-sky-400 transition-colors">
+            class="group bg-white/10 hover:bg-white/20 border border-white/15 block p-4 rounded-xl transition-all duration-300 w-full flex items-center gap-3 active:scale-95">
+            <div class="bg-white/15 p-2 rounded-lg group-hover:bg-sky-500/30 group-hover:text-sky-300 transition-colors">
               <i class='bx ${icon} text-xl'></i>
             </div>
-            <div class="font-semibold text-sm md:text-base text-left flex-1">${l.name}</div>
-            <i class='bx bx-chevron-right text-xl opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all'></i>
+            <div class="font-semibold text-sm md:text-base text-left flex-1 text-white">${l.name}</div>
+            <i class='bx bx-chevron-right text-xl opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all'></i>
           </a>`;
         });
       } else {
@@ -156,10 +156,6 @@
       if (loader) loader.style.display = "none";
     });
   }
-
-  /* =========================================================
-     FUNGSI COPY, SHARE & DOWNLOAD QR (FULL WORKING CODE)
-  ========================================================= */
 
   /* 1. COPY LINK */
   function copyLink() {
