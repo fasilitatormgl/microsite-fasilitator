@@ -1,109 +1,96 @@
-body{
-  margin:0;
-  font-family:sans-serif;
-  color:white;
-  min-height:100vh;
-  background:
-    linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.45)),
-    url('/backgroundmgl.webp');
-  background-size:cover;
-  background-position:center;
-  background-attachment:fixed;
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: white;
+  min-height: 100vh;
+  background: linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.8)), url('/backgroundmgl.webp');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
-@media(max-width:768px){
-  body{
-    background-attachment:scroll;
-  }
+@media(max-width: 768px) {
+  body { background-attachment: scroll; }
 }
 
-.glass{
-  background:rgba(255,255,255,.08);
-  backdrop-filter:blur(20px);
-  border:1px solid rgba(255,255,255,.08);
-  box-shadow:0 8px 30px rgba(0,0,0,.2);
+/* Modern Glassmorphism */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
 }
 
-.neon{
-  color:cyan;
-  text-shadow:
-    0 0 5px cyan,
-    0 0 15px cyan;
+.glass-card {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
 }
 
-input,
-select{
-  transition:.25s;
-  outline:none;
+/* Soft Glow Text */
+.glow-text {
+  color: #38bdf8;
+  text-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
 }
 
-input:focus,
-select:focus{
-  transform:scale(1.01);
-  box-shadow:0 0 0 2px cyan;
+input, select {
+  transition: all 0.3s ease;
+  outline: none;
+  background: rgba(255, 255, 255, 0.9) !important; /* Terang agar mudah dibaca */
+  border: 2px solid transparent;
 }
 
-button{
-  transition:.2s;
+input:focus, select:focus {
+  transform: translateY(-1px);
+  border-color: #38bdf8;
+  box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2);
 }
 
-button:hover{
-  transform:translateY(-2px);
+button {
+  transition: all 0.2s ease-in-out;
+}
+button:hover { transform: translateY(-2px); }
+button:active { transform: scale(0.95); }
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.3);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.5); }
+
+/* Loading Animation */
+#loadingScreen {
+  position: fixed; inset: 0;
+  background: rgba(15, 23, 42, 0.95);
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  z-index: 99999;
 }
 
-button:active{
-  transform:scale(.95);
+.loader {
+  width: 50px; height: 50px;
+  border: 4px solid rgba(255,255,255,0.1);
+  border-top: 4px solid #38bdf8;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
+@keyframes spin { 100% { transform: rotate(360deg); } }
 
-.fade{
-  animation:fade .4s ease;
+/* Marquee */
+.marquee-container {
+  overflow: hidden; white-space: nowrap;
+  background: rgba(56, 189, 248, 0.1);
+  border-radius: 20px;
+  padding: 4px 0;
 }
-
-@keyframes fade{
-  from{
-    opacity:0;
-    transform:translateY(10px);
-  }
-  to{
-    opacity:1;
-    transform:translateY(0);
-  }
+.marquee-container span {
+  display: inline-block; padding-left: 100%;
+  animation: marquee 12s linear infinite;
 }
-
-::-webkit-scrollbar{
-  width:8px;
-}
-
-::-webkit-scrollbar-thumb{
-  background:rgba(255,255,255,.2);
-  border-radius:20px;
-}
-
-#loadingScreen{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.9);
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  z-index:99999;
-}
-
-.loader{
-  width:55px;
-  height:55px;
-  border:5px solid rgba(255,255,255,.1);
-  border-top:5px solid cyan;
-  border-radius:50%;
-  animation:spin 1s linear infinite;
-}
-
-@keyframes spin{
-  from{
-    transform:rotate(0);
-  }
-  to{
-    transform:rotate(360deg);
-  }
-}
+@keyframes marquee { 100% { transform: translateX(-100%); } }
