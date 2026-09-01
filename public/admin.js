@@ -1,468 +1,63 @@
-const firebaseConfig = {
-  apiKey: "AIzaSyDSnHojwSRgk71MPpOuvFlgwiGnv8GPuc4",
-  authDomain: "gofasilitator.firebaseapp.com",
-  projectId: "gofasilitator",
-};
-
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
-
-const db = firebase.firestore();
-
 /* =========================
-   LOADING
-========================= */
-window.addEventListener("load", () => {
-  const loading = document.getElementById("loadingScreen");
-  if (loading) loading.style.display = "none";
-});
-
-/* =========================
-   LOGIN PROTECT
-========================= */
-firebase.auth().onAuthStateChanged(user => {
-  const loading = document.getElementById("loadingScreen");
-
-  if (!user) {
-    if (loading) loading.style.display = "flex";
-    location.href = "login.html";
-  } else {
-    if (loading) loading.style.display = "none";
-  }
-});
-
-/* =========================
-   GLOBAL
-========================= */
-let links = [];
-let editIndex = null;
-let currentQR = "";
-
-/* =========================
-   MODAL LINK
-========================= */
-function addLink() {
-  editIndex = null;
-
-  linkName.value = "";
-  linkUrl.value = "";
-  linkCategory.value = "Dokumen";
-
-  modalLink.classList.remove("hidden");
-
-  setTimeout(() => {
-    linkName.focus();
-  }, 150);
-}
-
-function editLink(i) {
-  editIndex = i;
-
-  linkName.value = links[i].name;
-  linkUrl.value = links[i].url;
-  linkCategory.value = links[i].category || "Dokumen";
-
-  modalLink.classList.remove("hidden");
-}
-
-function closeModal() {
-  modalLink.classList.add("hidden");
-}
-
-function saveLink() {
-  const name = linkName.value.trim();
-  const url = linkUrl.value.trim();
-  const category = linkCategory.value;
-
-  if (!name || !url) {
-    alert("Nama dan URL wajib diisi.");
-    return;
-  }
-
-  const item = {
-    name,
-    url,
-    category
-  };
-
-  if (editIndex !== null) {
-    links[editIndex] = item;
-  } else {
-    links.push(item);
-  }
-
-  renderLinks();
-  closeModal();
-}
-
-/* =========================
-   RENDER LINKS
+   RENDER LINKS (Update tampilan list link di Form)
 ========================= */
 function renderLinks() {
   const box = document.getElementById("links");
-
   if (!links.length) {
-    box.innerHTML = `
-      <div class="text-sm opacity-50">
-        Belum ada link
-      </div>
-    `;
+    box.innerHTML = `<div class="text-sm opacity-50 text-center py-4">Belum ada link ditambahkan</div>`;
     return;
   }
 
-  let groups = {};
-
-  links.forEach((link, index) => {
-    const cat = link.category || "Lainnya";
-
-    if (!groups[cat]) {
-      groups[cat] = [];
-    }
-
-    groups[cat].push({
-      ...link,
-      originalIndex: index
-    });
-  });
-
   let html = "";
-
-  for (let category in groups) {
+  links.forEach((link, i) => {
     html += `
-      <div class="mb-4">
-        <div class="text-cyan-300 font-semibold mb-2">
-          📁 ${category}
+      <div class="bg-white/10 border border-white/5 rounded-xl p-3 flex justify-between items-center group">
+        <div class="overflow-hidden pr-2">
+          <div class="font-semibold text-sm truncate">${link.name}</div>
+          <div class="text-xs opacity-60 truncate">${link.url}</div>
         </div>
+        <div class="flex gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+          <button onclick="moveUp(${i})" class="p-1.5 hover:bg-white/20 rounded-lg text-gray-300" title="Ke atas"><i class='bx bx-up-arrow-alt'></i></button>
+          <button onclick="moveDown(${i})" class="p-1.5 hover:bg-white/20 rounded-lg text-gray-300" title="Ke bawah"><i class='bx bx-down-arrow-alt'></i></button>
+          <button onclick="editLink(${i})" class="p-1.5 hover:bg-sky-500/20 text-sky-400 rounded-lg" title="Edit"><i class='bx bx-edit'></i></button>
+          <button onclick="removeLink(${i})" class="p-1.5 hover:bg-red-500/20 text-red-400 rounded-lg" title="Hapus"><i class='bx bx-trash'></i></button>
+        </div>
+      </div>
     `;
-
-    groups[category].forEach(link => {
-      const i = link.originalIndex;
-
-      html += `
-        <div class="glass rounded-lg p-3 mb-2">
-
-          <div class="font-semibold">
-            ${link.name}
-          </div>
-
-          <div class="text-xs opacity-60 truncate mb-2">
-            ${link.url}
-          </div>
-
-          <div class="flex gap-2 flex-wrap">
-            <button onclick="editLink(${i})">✏️</button>
-            <button onclick="removeLink(${i})">🗑️</button>
-            <button onclick="moveUp(${i})">⬆️</button>
-            <button onclick="moveDown(${i})">⬇️</button>
-          </div>
-
-        </div>
-      `;
-    });
-
-    html += `</div>`;
-  }
-
+  });
   box.innerHTML = html;
 }
 
-function removeLink(i) {
-  if (!confirm("Hapus link?")) return;
-
-  links.splice(i, 1);
-  renderLinks();
-}
-
-function moveUp(i) {
-  if (i === 0) return;
-
-  [links[i], links[i - 1]] = [links[i - 1], links[i]];
-  renderLinks();
-}
-
-function moveDown(i) {
-  if (i === links.length - 1) return;
-
-  [links[i], links[i + 1]] = [links[i + 1], links[i]];
-  renderLinks();
-}
-
 /* =========================
-   SAVE MICROSITE
-========================= */
-function save() {
-  const slugVal = slug.value.trim().toLowerCase();
-
-  if (!slugVal || !title.value.trim()) {
-    alert("Slug & Title wajib.");
-    return;
-  }
-
-  db.collection("microsites")
-    .doc(slugVal)
-    .set({
-      title: title.value.trim(),
-      description: desc.value.trim(),
-      category: micrositeCategory.value,
-      links: links
-    })
-    .then(() => {
-      alert("Microsite tersimpan.");
-
-      resetForm();
-      loadData();
-    });
-}
-
-/* =========================
-   LOAD DATA
+   LOAD DATA (Update tampilan Card List Microsite)
 ========================= */
 function loadData() {
-  db.collection("microsites")
-    .get()
-    .then(snapshot => {
-
-      let groups = {};
-
-      snapshot.forEach(doc => {
-        const d = doc.data();
-        const cat = d.category || "Lainnya";
-
-        if (!groups[cat]) {
-          groups[cat] = [];
-        }
-
-        groups[cat].push({
-          id: doc.id,
-          ...d
-        });
-      });
-
-      let html = "";
-
-      for (let category in groups) {
-
-        html += `
-          <div class="md:col-span-2">
-            <h3 class="text-cyan-300 font-bold text-lg mb-3">
-              📁 ${category}
-            </h3>
-          </div>
-        `;
-
-        groups[category].forEach(item => {
-          html += `
-            <div class="glass p-4 rounded-xl">
-
-              <h3 class="font-bold">
-                ${item.id}
-              </h3>
-
-              <p class="opacity-80">
-                ${item.title}
-              </p>
-
-              <div class="text-xs opacity-60 mb-3">
-                ${item.links?.length || 0} link
-              </div>
-
-              <div class="flex gap-2 flex-wrap">
-                <button onclick="edit('${item.id}')">✏️</button>
-                <button onclick="hapus('${item.id}')">🗑️</button>
-                <button onclick="stat('${item.id}')">📊</button>
-                <button onclick="share('${item.id}')">🔗</button>
-                <button onclick="showQR('${item.id}')">📱</button>
-              </div>
-
-            </div>
-          `;
-        });
-      }
-
-      list.innerHTML = html;
-    });
-}
-
-/* =========================
-   EDIT
-========================= */
-function edit(id) {
-  db.collection("microsites")
-    .doc(id)
-    .get()
-    .then(doc => {
+  db.collection("microsites").get().then(snapshot => {
+    let html = "";
+    snapshot.forEach(doc => {
       const d = doc.data();
+      const cat = d.category || "Lainnya";
 
-      slug.value = id;
-      title.value = d.title;
-      desc.value = d.description;
-
-      micrositeCategory.value =
-        d.category || "Kelurahan";
-
-      links = d.links || [];
-
-      renderLinks();
-
-      history.replaceState(
-        null,
-        "",
-        "?edit=" + id
-      );
-
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-      });
+      html += `
+        <div class="glass-card p-5 transition-transform hover:-translate-y-1" data-category="${cat}">
+          <div class="flex justify-between items-start mb-2">
+            <span class="bg-indigo-500/20 text-indigo-300 text-xs px-2.5 py-1 rounded-md font-semibold border border-indigo-500/20">${cat}</span>
+            <div class="text-xs font-mono opacity-50"><i class='bx bx-link'></i> ${d.links?.length || 0} Tautan</div>
+          </div>
+          
+          <h3 class="font-bold text-lg mb-1 mt-3 truncate">${d.title}</h3>
+          <p class="text-sm opacity-60 truncate mb-4">/${doc.id}</p>
+          
+          <div class="grid grid-cols-5 gap-2 border-t border-white/10 pt-4 mt-2">
+            <button onclick="edit('${doc.id}')" class="flex justify-center py-2 bg-white/5 hover:bg-sky-500/20 hover:text-sky-400 rounded-lg transition-colors tooltip" title="Edit"><i class='bx bx-edit-alt text-lg'></i></button>
+            <button onclick="stat('${doc.id}')" class="flex justify-center py-2 bg-white/5 hover:bg-indigo-500/20 hover:text-indigo-400 rounded-lg transition-colors tooltip" title="Statistik"><i class='bx bx-bar-chart-alt-2 text-lg'></i></button>
+            <button onclick="share('${doc.id}')" class="flex justify-center py-2 bg-white/5 hover:bg-green-500/20 hover:text-green-400 rounded-lg transition-colors tooltip" title="Share"><i class='bx bx-share-alt text-lg'></i></button>
+            <button onclick="showQR('${doc.id}')" class="flex justify-center py-2 bg-white/5 hover:bg-yellow-500/20 hover:text-yellow-400 rounded-lg transition-colors tooltip" title="QR Code"><i class='bx bx-qr text-lg'></i></button>
+            <button onclick="hapus('${doc.id}')" class="flex justify-center py-2 bg-white/5 hover:bg-red-500/20 hover:text-red-400 rounded-lg transition-colors tooltip" title="Hapus"><i class='bx bx-trash text-lg'></i></button>
+          </div>
+        </div>
+      `;
     });
+    document.getElementById("list").innerHTML = html;
+  });
 }
-
-/* =========================
-   DELETE
-========================= */
-function hapus(id) {
-  if (!confirm("Hapus microsite?")) return;
-
-  db.collection("microsites")
-    .doc(id)
-    .delete()
-    .then(() => {
-      loadData();
-    });
-}
-
-/* =========================
-   STAT
-========================= */
-function stat(slugVal) {
-  db.collection("clicks")
-    .where("slug", "==", slugVal)
-    .get()
-    .then(snap => {
-      alert(
-        "Total klik: " + snap.size
-      );
-    });
-}
-
-/* =========================
-   SHARE
-========================= */
-function share(slugVal) {
-  const url =
-    location.origin + "/" + slugVal;
-
-  const text =
-`Akses link ${slugVal}
-melalui tautan berikut:
-
-${url}`;
-
-  navigator.clipboard
-    .writeText(text)
-    .then(() => {
-      alert("Link siap dibagikan:\n\n" + text);
-    })
-    .catch(() => {
-      prompt("Copy link:", text);
-    });
-}
-
-/* =========================
-   RESET
-========================= */
-function resetForm() {
-  slug.value = "";
-  title.value = "";
-  desc.value = "";
-
-  micrositeCategory.value =
-    "Kelurahan";
-
-  links = [];
-  renderLinks();
-}
-
-/* =========================
-   QR
-========================= */
-function showQR(slugVal) {
-  const url =
-    location.origin + "/" + slugVal;
-
-  currentQR = url;
-
-  document.getElementById(
-    "qrcode"
-  ).innerHTML = "";
-
-  new QRCode(
-    document.getElementById(
-      "qrcode"
-    ),
-    {
-      text: url,
-      width: 200,
-      height: 200
-    }
-  );
-
-  document
-    .getElementById("qrModal")
-    .classList.remove("hidden");
-}
-
-function closeQR() {
-  document
-    .getElementById("qrModal")
-    .classList.add("hidden");
-}
-
-function downloadQR() {
-  const img =
-    document.querySelector(
-      "#qrcode img"
-    );
-
-  if (!img) {
-    alert("QR belum siap.");
-    return;
-  }
-
-  const link =
-    document.createElement("a");
-
-  link.href = img.src;
-
-  link.download =
-    "QR-" +
-    currentQR
-      .split("/")
-      .pop() +
-    ".png";
-
-  link.click();
-}
-
-/* =========================
-   AUTO LOAD
-========================= */
-window.addEventListener(
-  "DOMContentLoaded",
-  () => {
-    loadData();
-
-    const params =
-      new URLSearchParams(
-        location.search
-      );
-
-    const editId =
-      params.get("edit");
-
-    if (editId) {
-      edit(editId);
-    }
-  }
-);
