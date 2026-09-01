@@ -69,7 +69,7 @@
     </div>
 
     <!-- DAFTAR LINK MANAGER -->
-    <div class="bg-black/20 p-4 rounded-2xl mb-6 border border-white/5">
+    <div class="bg-black/30 p-4 rounded-2xl mb-6 border border-white/10">
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-sm font-semibold flex items-center gap-1"><i class='bx bx-link-alt'></i> Tautan (Links)</h3>
         <button onclick="addLink()" class="bg-sky-500 hover:bg-sky-600 text-white px-3 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-1 shadow-lg shadow-sky-500/30">
@@ -96,17 +96,17 @@
         </h2>
         <div class="relative w-full md:w-64">
           <i class='bx bx-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-lg'></i>
-          <input type="text" id="searchInput" placeholder="Cari microsite..." class="w-full pl-10 p-2.5 text-gray-800 rounded-xl bg-white text-sm">
+          <input type="text" id="searchInput" placeholder="Cari microsite..." class="w-full pl-10 p-2.5 text-gray-800 rounded-xl bg-white text-sm" onkeyup="applyMicrositeFilters()">
         </div>
       </div>
       
       <!-- Filter Tags -->
       <div class="flex flex-wrap gap-2" id="micrositeCategoryFilters">
-        <button class="ms-cat-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-white/20 hover:bg-white/30 text-white transition-all border border-white/10" data-cat="OPD">OPD</button>
-        <button class="ms-cat-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-white/20 hover:bg-white/30 text-white transition-all border border-white/10" data-cat="Kecamatan">Kecamatan</button>
-        <button class="ms-cat-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-white/20 hover:bg-white/30 text-white transition-all border border-white/10" data-cat="Dokumen">Dokumen</button>
-        <button class="ms-cat-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-white/20 hover:bg-white/30 text-white transition-all border border-white/10" data-cat="FASILITATOR">FASILITATOR</button>
-        <button class="ms-cat-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-white/20 hover:bg-white/30 text-white transition-all border border-white/10" data-cat="Publik">Publik</button>
+        <button class="ms-cat-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-sky-500 border-sky-400 text-white transition-all border" data-cat="OPD">OPD</button>
+        <button class="ms-cat-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-sky-500 border-sky-400 text-white transition-all border" data-cat="Kecamatan">Kecamatan</button>
+        <button class="ms-cat-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-sky-500 border-sky-400 text-white transition-all border" data-cat="Dokumen">Dokumen</button>
+        <button class="ms-cat-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-sky-500 border-sky-400 text-white transition-all border" data-cat="FASILITATOR">FASILITATOR</button>
+        <button class="ms-cat-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-sky-500 border-sky-400 text-white transition-all border" data-cat="Publik">Publik</button>
       </div>
     </div>
 
@@ -115,9 +115,9 @@
   </div>
 </div>
 
-<!-- Modal Link (Tetap Sama, disesuaikan desainnya) -->
+<!-- Modal Link -->
 <div id="modalLink" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-  <div class="bg-[#1e293b] border border-white/10 p-6 rounded-3xl w-full max-w-sm shadow-2xl">
+  <div class="glass p-6 rounded-3xl w-full max-w-sm shadow-2xl">
     <h2 class="text-lg font-bold mb-5 flex items-center gap-2"><i class='bx bx-link text-sky-400'></i> Kelola Tautan</h2>
     <div class="space-y-4 mb-6">
       <input id="linkName" placeholder="Nama Link" class="w-full p-3 text-gray-800 rounded-xl">
@@ -137,21 +137,56 @@
   </div>
 </div>
 
+<!-- Modal QR Code -->
+<div id="qrModal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+  <div class="glass p-6 rounded-3xl w-full max-w-sm shadow-2xl text-center">
+    <h2 class="text-lg font-bold mb-5 flex items-center justify-center gap-2">
+      <i class='bx bx-qr text-sky-400'></i> QR Code
+    </h2>
+    <div id="qrcode" class="mb-5 flex justify-center bg-white p-4 rounded-xl shadow-inner inline-block mx-auto"></div>
+    <div class="flex gap-3 justify-center mt-2">
+      <button onclick="closeQR()" class="px-5 py-2.5 rounded-xl font-semibold bg-white/10 hover:bg-white/20">Tutup</button>
+      <button onclick="downloadQR()" class="px-5 py-2.5 rounded-xl font-semibold bg-green-500 hover:bg-green-600 text-white shadow-lg shadow-green-500/30 flex items-center gap-1">
+        <i class='bx bx-download'></i> Download
+      </button>
+    </div>
+  </div>
+</div>
+
 <script src="admin.js"></script>
 
-<!-- Logika Filter (Disederhanakan untuk UI baru) -->
+<!-- Logika Filter Sederhana -->
 <script>
-  // Sama dengan logika aslimu, tapi sesuaikan class tombol aktifnya dengan Tailwind
-  // Contoh: aktif = bg-sky-500 border-sky-400
+  const activeCategoriesMS = new Set(['OPD', 'Kecamatan', 'Dokumen', 'FASILITATOR', 'Publik', 'Lainnya']);
+
   document.querySelectorAll('.ms-cat-filter-btn').forEach(btn => {
-    btn.classList.add('bg-sky-500', 'border-sky-400'); // Default aktif
     btn.addEventListener('click', function() {
-       this.classList.toggle('bg-sky-500');
-       this.classList.toggle('border-sky-400');
-       this.classList.toggle('bg-white/20');
-       // ... trigger applyMicrositeFilters() dari script lama kamu
+       const cat = this.getAttribute('data-cat');
+       if(activeCategoriesMS.has(cat)) {
+         activeCategoriesMS.delete(cat);
+         this.classList.remove('bg-sky-500', 'border-sky-400');
+         this.classList.add('bg-white/20', 'border-white/10');
+       } else {
+         activeCategoriesMS.add(cat);
+         this.classList.add('bg-sky-500', 'border-sky-400');
+         this.classList.remove('bg-white/20', 'border-white/10');
+       }
+       applyMicrositeFilters();
     });
   });
+
+  function applyMicrositeFilters() {
+    const searchTerm = document.getElementById('searchInput')?.value.toLowerCase().trim() || '';
+    const cards = document.querySelectorAll('#list > div');
+    
+    cards.forEach(card => {
+      const cat = card.getAttribute('data-category') || 'Lainnya';
+      const text = card.textContent?.toLowerCase() || '';
+      const matchSearch = searchTerm === '' || text.includes(searchTerm);
+      const catActive = activeCategoriesMS.has(cat);
+      card.style.display = ((catActive && matchSearch) || (searchTerm !== '' && matchSearch)) ? '' : 'none';
+    });
+  }
 </script>
 </body>
 </html>
