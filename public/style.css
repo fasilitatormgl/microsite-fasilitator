@@ -5,7 +5,8 @@ body {
   font-family: 'Plus Jakarta Sans', sans-serif;
   color: white;
   min-height: 100vh;
-  background: linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.8)), url('/backgroundmgl.webp');
+  /* Overlay background dibikin sedikit lebih gelap agar tulisan tidak silau */
+  background: linear-gradient(rgba(15, 23, 42, 0.82), rgba(15, 23, 42, 0.88)), url('/backgroundmgl.webp');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -15,38 +16,44 @@ body {
   body { background-attachment: scroll; }
 }
 
-/* Modern Glassmorphism */
+/* Glassmorphism Utama (Form Admin, Container Publik, Modal) */
+/* Background dibuat biru dongker (slate) gelap pekat 85% */
 .glass {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  background: rgba(15, 23, 42, 0.85) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 }
 
+/* Glass Card untuk item-item microsite di list Database */
 .glass-card {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  background: rgba(30, 41, 59, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 /* Soft Glow Text */
 .glow-text {
   color: #38bdf8;
-  text-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+  text-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
 }
 
+/* Styling Input & Select agar lebih kontras */
 input, select {
   transition: all 0.3s ease;
   outline: none;
-  background: rgba(255, 255, 255, 0.9) !important; /* Terang agar mudah dibaca */
+  background: #ffffff !important;
+  color: #0f172a !important;
   border: 2px solid transparent;
 }
 
 input:focus, select:focus {
   transform: translateY(-1px);
-  border-color: #38bdf8;
-  box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2);
+  border-color: #38bdf8 !important;
+  box-shadow: 0 4px 14px rgba(56, 189, 248, 0.3);
 }
 
 button {
@@ -57,7 +64,7 @@ button:active { transform: scale(0.95); }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
 ::-webkit-scrollbar-thumb {
   background: rgba(255,255,255,0.3);
   border-radius: 10px;
@@ -82,12 +89,13 @@ button:active { transform: scale(0.95); }
 }
 @keyframes spin { 100% { transform: rotate(360deg); } }
 
-/* Marquee */
+/* Marquee Running Text */
 .marquee-container {
   overflow: hidden; white-space: nowrap;
-  background: rgba(56, 189, 248, 0.1);
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.3);
   border-radius: 20px;
-  padding: 4px 0;
+  padding: 6px 0;
 }
 .marquee-container span {
   display: inline-block; padding-left: 100%;
