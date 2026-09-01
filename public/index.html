@@ -7,7 +7,6 @@
   
   <link rel="icon" href="/favicon.png">
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Boxicons untuk Ikon Profesional -->
   <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
   <link rel="stylesheet" href="style.css">
   
@@ -17,7 +16,7 @@
 </head>
 <body class="flex flex-col items-center justify-center p-4 min-h-screen">
 
-  <div id="app" class="w-full max-w-md w-full transition-all duration-500">
+  <div id="app" class="w-full max-w-md transition-all duration-500">
     <div id="loadingScreen"><div class="loader"></div></div>
   </div>
 
@@ -27,17 +26,21 @@
     authDomain: "gofasilitator.firebaseapp.com",
     projectId: "gofasilitator",
   };
-  firebase.initializeApp(firebaseConfig);
+
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
   const db = firebase.firestore();
 
   const slug = window.location.pathname.replace("/", "").toLowerCase();
   const app = document.getElementById("app");
 
-  if(!slug || slug==="index.html" || slug===""){
-    document.getElementById("loadingScreen").style.display = "none";
-    app.innerHTML=`
+  if (!slug || slug === "index.html" || slug === "") {
+    const loader = document.getElementById("loadingScreen");
+    if (loader) loader.style.display = "none";
+    app.innerHTML = `
       <div class="glass p-8 rounded-3xl text-center">
-        <img src="/logo.png" class="w-16 h-16 mx-auto mb-4">
+        <img src="/logo.png" class="w-16 h-16 mx-auto mb-4" alt="Logo">
         <h2 class="text-2xl font-bold glow-text">Microsite Fasilitator</h2>
         <p class="text-sm opacity-70 mt-2">Sistem Informasi Prodamai</p>
       </div>`;
@@ -45,85 +48,85 @@
     load(slug);
   }
 
-  function load(slug){
-    db.collection("microsites").doc(slug).get().then(doc=>{
-      if(!doc.exists){
-        app.innerHTML=`
+  function load(slug) {
+    db.collection("microsites").doc(slug).get().then(doc => {
+      const loader = document.getElementById("loadingScreen");
+      if (loader) loader.style.display = "none";
+
+      if (!doc.exists) {
+        app.innerHTML = `
           <div class="glass p-8 rounded-3xl text-center">
             <i class='bx bx-error-circle text-5xl text-red-400 mb-3'></i>
             <h2 class="text-xl font-bold">Halaman Tidak Ditemukan</h2>
-            <p class="text-sm opacity-70 mt-2">Pastikan link URL sudah benar.</p>
+            <p class="text-sm opacity-70 mt-2">Pastikan link URL yang kamu masukkan sudah benar.</p>
           </div>`;
         return;
       }
 
       const d = doc.data();
       let html = `
-      <div class="glass p-6 md:p-8 rounded-3xl animate-[fadeIn_0.5s_ease-out]">
+      <div class="glass p-6 md:p-8 rounded-3xl">
         
-        <!-- Header -->
         <div class="flex flex-col items-center justify-center mb-6">
-          <img src="/logo.png" class="w-14 h-14 mb-3 drop-shadow-lg">
-          <h1 class="text-2xl font-bold text-center glow-text leading-tight">${d.title}</h1>
-          <p class="text-sm opacity-80 mt-2 text-center">${d.description}</p>
+          <img src="/logo.png" class="w-14 h-14 mb-3 drop-shadow-lg" alt="Logo">
+          <h1 class="text-2xl font-bold text-center glow-text leading-tight">${d.title || "Microsite"}</h1>
+          <p class="text-sm opacity-80 mt-2 text-center">${d.description || ""}</p>
         </div>
 
-        <!-- Marquee -->
         <div class="marquee-container text-xs text-sky-200 mb-6 font-medium">
-          <span><i class='bx bxs-megaphone mr-1'></i> Info: Fasilitator PRODAMAI Magelang • <i class='bx bx-check-shield mx-1'></i> Sistem Informasi Prodamai</span>
+          <span><i class='bx bxs-megaphone mr-1'></i> Info: Fasilitator PRODAMAI Magelang &nbsp;&nbsp;&nbsp; <i class='bx bx-check-shield mx-1'></i> Sistem Informasi Prodamai</span>
         </div>
 
-        <!-- Links -->
         <div id="links" class="space-y-3 mb-8"></div>
 
-        <!-- QR Code & Actions -->
         <div class="glass-card p-4 text-center mt-6">
-          <h3 class="text-sm font-semibold mb-3 opacity-90"><i class='bx bx-qr-scan'></i> Scan QR Code</h3>
-          <div class="bg-white p-2 rounded-xl inline-block shadow-lg mb-3">
-            <canvas id="qr" class="rounded-lg"></canvas>
+          <h3 class="text-sm font-semibold mb-3 opacity-90 flex items-center justify-center gap-1">
+            <i class='bx bx-qr-scan'></i> Scan QR Code
+          </h3>
+          <div class="bg-white p-3 rounded-xl inline-block shadow-lg mb-3">
+            <canvas id="qr" class="rounded-lg mx-auto"></canvas>
           </div>
-          <div class="text-xs break-all opacity-60 mb-4 bg-black/20 p-2 rounded-lg font-mono">
+          <div class="text-xs break-all opacity-60 mb-4 bg-black/30 p-2 rounded-lg font-mono">
             ${location.href}
           </div>
           
           <div class="grid grid-cols-2 gap-2">
-            <button onclick="copyLink()" class="bg-sky-500/20 hover:bg-sky-500/40 text-sky-300 border border-sky-500/30 px-3 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1">
-              <i class='bx bx-copy'></i> Copy
+            <button onclick="copyLink()" class="bg-sky-500/20 hover:bg-sky-500/40 text-sky-300 border border-sky-500/30 px-3 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1 transition-all active:scale-95">
+              <i class='bx bx-copy text-base'></i> Copy Link
             </button>
-            <button onclick="shareLink()" class="bg-indigo-500/20 hover:bg-indigo-500/40 text-indigo-300 border border-indigo-500/30 px-3 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1">
-              <i class='bx bx-share-alt'></i> Share
+            <button onclick="shareLink()" class="bg-indigo-500/20 hover:bg-indigo-500/40 text-indigo-300 border border-indigo-500/30 px-3 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1 transition-all active:scale-95">
+              <i class='bx bx-share-alt text-base'></i> Share
             </button>
-            <button onclick="downloadQR()" class="col-span-2 bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1 mt-1">
-              <i class='bx bx-download'></i> Download QR Code
+            <button onclick="downloadQR()" class="col-span-2 bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1 mt-1 transition-all active:scale-95">
+              <i class='bx bx-download text-base'></i> Download QR Code
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Footer -->
       <footer class="mt-8 text-center text-xs opacity-60">
         <a href="https://siomaimagelang.web.app/" target="_blank" class="font-bold text-sky-400 hover:text-sky-300 flex justify-center items-center gap-1 mb-1 text-sm transition-colors">
           <i class='bx bx-link-external'></i> SIOMAI - Sistem Informasi Prodamai
         </a>
-        <p>Dikembangkan oleh Koord Prodamai</p>
+        <p>by Koord Prodamai Penunggu kantor</p>
       </footer>
       `;
 
       app.innerHTML = html;
 
+      // Render Link Buttons
       let linksHTML = "";
-      if(d.links) {
-        d.links.forEach(l=>{
-          // Pilih ikon berdasarkan kategori (opsional, default ke link)
+      if (d.links && d.links.length > 0) {
+        d.links.forEach(l => {
           let icon = "bx-link";
-          if(l.category === "Dokumen") icon = "bx-file";
-          if(l.category === "Website") icon = "bx-globe";
-          if(l.category === "Spreadsheet") icon = "bx-table";
-          if(l.category === "Drive") icon = "bxl-google-drive";
+          if (l.category === "Dokumen") icon = "bx-file";
+          if (l.category === "Website") icon = "bx-globe";
+          if (l.category === "Spreadsheet") icon = "bx-table";
+          if (l.category === "Drive") icon = "bxl-google-drive";
 
           linksHTML += `
           <a href="${l.url}" target="_blank" rel="noopener noreferrer" 
-            class="group bg-white/5 hover:bg-white/15 border border-white/10 block p-4 rounded-xl transition-all duration-300 w-full flex items-center gap-3">
+            class="group bg-white/5 hover:bg-white/15 border border-white/10 block p-4 rounded-xl transition-all duration-300 w-full flex items-center gap-3 active:scale-95">
             <div class="bg-white/10 p-2 rounded-lg group-hover:bg-sky-500/20 group-hover:text-sky-400 transition-colors">
               <i class='bx ${icon} text-xl'></i>
             </div>
@@ -131,28 +134,119 @@
             <i class='bx bx-chevron-right text-xl opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all'></i>
           </a>`;
         });
+      } else {
+        linksHTML = `<div class="text-sm opacity-50 text-center py-4">Belum ada link tersedia</div>`;
       }
       document.getElementById("links").innerHTML = linksHTML;
 
-      // QR Gen
-      QRCode.toCanvas(document.getElementById("qr"), location.href, {
-        width: 150, margin: 1, color: { dark: '#0f172a', light: '#ffffff' }
-      });
+      // Generate QR Canvas
+      setTimeout(() => {
+        const qrCanvas = document.getElementById("qr");
+        if (qrCanvas) {
+          QRCode.toCanvas(qrCanvas, location.href, {
+            width: 160,
+            margin: 1,
+            color: { dark: '#0f172a', light: '#ffffff' }
+          });
+        }
+      }, 100);
+    }).catch(err => {
+      console.error(err);
+      const loader = document.getElementById("loadingScreen");
+      if (loader) loader.style.display = "none";
     });
   }
 
-  /* Fungsi Copy, Share, Notif, Download tetap sama, hanya ganti style notifnya */
-  function copyLink(){ /* ... kode kamu ... */ }
-  function shareLink(){ /* ... kode kamu ... */ }
-  function fallbackCopy(text){ /* ... kode kamu ... */ }
-  function downloadQR(){ /* ... kode kamu ... */ }
+  /* =========================================================
+     FUNGSI COPY, SHARE & DOWNLOAD QR (FULL WORKING CODE)
+  ========================================================= */
 
-  function showNotif(msg){
+  /* 1. COPY LINK */
+  function copyLink() {
+    const slugStr = location.pathname.replace("/", "");
+    const urlStr = location.href;
+    const textToCopy = `🚀 Akses link ${slugStr} melalui tautan ini:\n\n${urlStr}`;
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(textToCopy)
+        .then(() => showNotif("Link berhasil disalin!"))
+        .catch(() => fallbackCopy(textToCopy));
+    } else {
+      fallbackCopy(textToCopy);
+    }
+  }
+
+  /* 2. SHARE LINK */
+  function shareLink() {
+    const slugStr = location.pathname.replace("/", "");
+    const urlStr = location.href;
+    const textToShare = `🚀 Akses link ${slugStr} melalui tautan ini:\n\n${urlStr}`;
+
+    if (navigator.share) {
+      navigator.share({
+        title: "Microsite Fasilitator",
+        text: textToShare,
+        url: urlStr
+      }).catch(err => console.log("Share dibatalkan:", err));
+    } else {
+      fallbackCopy(textToShare);
+      showNotif("Link disalin untuk dibagikan!");
+    }
+  }
+
+  /* 3. FALLBACK COPY */
+  function fallbackCopy(text) {
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+
+    try {
+      document.execCommand("copy");
+      showNotif("Link berhasil disalin!");
+    } catch (err) {
+      alert("Gagal menyalin otomatis, silakan copy manual:\n\n" + text);
+    }
+
+    document.body.removeChild(textarea);
+  }
+
+  /* 4. DOWNLOAD QR CODE */
+  function downloadQR() {
+    const canvas = document.getElementById("qr");
+    if (!canvas) {
+      alert("QR Code belum siap untuk di-download.");
+      return;
+    }
+
+    const currentSlug = location.pathname.replace("/", "") || "microsite";
+    const domain = location.hostname.replace(/\./g, "-");
+
+    const link = document.createElement("a");
+    link.href = canvas.toDataURL("image/png");
+    link.download = `microsite-${domain}-${currentSlug}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  /* 5. SHOW NOTIF */
+  function showNotif(msg) {
+    const oldNotif = document.getElementById("notif-popup");
+    if (oldNotif) oldNotif.remove();
+
     const notif = document.createElement("div");
-    notif.innerHTML = `<i class='bx bx-check-circle mr-1'></i> ${msg}`;
-    notif.className = "fixed bottom-10 left-1/2 -translate-x-1/2 bg-sky-500 text-white px-5 py-3 rounded-full shadow-lg font-medium text-sm flex items-center z-[99999] animate-[fadeIn_0.3s_ease-out]";
+    notif.id = "notif-popup";
+    notif.innerHTML = `<i class='bx bx-check-circle text-xl mr-2'></i> <span>${msg}</span>`;
+    notif.className = "fixed bottom-10 left-1/2 -translate-x-1/2 bg-sky-500 text-white px-5 py-3 rounded-full shadow-2xl font-medium text-sm flex items-center z-[99999] transition-all duration-300";
+    
     document.body.appendChild(notif);
-    setTimeout(()=>notif.remove(), 2500);
+    setTimeout(() => {
+      if (notif) notif.remove();
+    }, 2500);
   }
 </script>
 </body>
