@@ -43,7 +43,7 @@ body {
    2. GLASSMORPHISM KHUSUS HALAMAN PUBLIK / INDEX (TRANSPARAN & CERAH)
 ========================================================= */
 .public-page .glass {
-  background: rgba(255, 255, 255, 0.12) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid rgba(255, 255, 255, 0.25);
